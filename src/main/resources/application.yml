@@ -2,15 +2,25 @@ spring:
   h2:
     console:
       enabled: true
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem://localhost/~/testdb;MODE=MYSQL
+    password:
+    username: sa
+    hikari:
+      jdbc-url: jdbc:h2:mem://localhost/~/testdb;MODE=MYSQL
+
 
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         query.in_clause_parameter_padding: true
+        storage_engin: innodb
         hbm2ddl:
           auto: create-drop
         format_sql: true
 
 logging.level:
   org.hibernate.SQL: debug
+
