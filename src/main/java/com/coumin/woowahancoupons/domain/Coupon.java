@@ -12,7 +12,7 @@ import java.util.*;
 public class Coupon extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coupon_id")
     private Long id;
 

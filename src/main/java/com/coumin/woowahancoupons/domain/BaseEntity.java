@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import javax.persistence.*;
 import org.springframework.data.annotation.*;
 import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public class BaseEntity {
 

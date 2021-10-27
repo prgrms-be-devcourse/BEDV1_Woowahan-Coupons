@@ -9,7 +9,7 @@ import javax.persistence.*;
 public class CouponAdmin extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
     private Long id;
 

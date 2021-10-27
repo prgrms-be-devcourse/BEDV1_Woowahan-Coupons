@@ -10,7 +10,7 @@ import java.util.*;
 public class Brand extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "brand_id")
     private Long id;
 
