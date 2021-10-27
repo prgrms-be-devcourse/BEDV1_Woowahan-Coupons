@@ -36,4 +36,12 @@ public class CouponWallet {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    public CouponWallet(Coupon coupon) {
+        this.coupon = coupon;
+    }
+
+    public void changeCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }
