@@ -19,6 +19,9 @@ public class Coupon extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = false)
+    private Long amount;
+
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime startAt;
 
@@ -51,5 +54,44 @@ public class Coupon extends BaseEntity {
     private String promotionCode;
 
     @OneToMany(mappedBy = "coupon")
-    private List<CouponWallet> couponWallets = new ArrayList<>();
+    private final List<CouponWallet> couponWallets = new ArrayList<>();
+
+    @Builder(builderMethodName = "internalBuilder")
+    private Coupon(Long id, String name, Long amount, LocalDateTime startAt,
+        LocalDateTime expiredAt, Long minOrderPrice,
+        DiscountType discountType, IssuerType issuerType, Long issuerId, Integer maxCount,
+        Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode) {
+        this.id = id;
+        this.name = name;
+        this.amount = amount;
+        this.startAt = startAt;
+        this.expiredAt = expiredAt;
+        this.minOrderPrice = minOrderPrice;
+        this.discountType = discountType;
+        this.issuerType = issuerType;
+        this.issuerId = issuerId;
+        this.maxCount = maxCount;
+        this.allocatedCount = allocatedCount;
+        this.maxCountPerCustomer = maxCountPerCustomer;
+        this.promotionCode = promotionCode;
+    }
+
+    public static CouponBuilder builder(String name, Long amount, LocalDateTime expiredAt,
+        DiscountType discountType, IssuerType issuerType, Long issuerId) {
+
+        Objects.requireNonNull(name, "name must not be null!");
+        Objects.requireNonNull(amount, "amount must not be null!");
+        Objects.requireNonNull(expiredAt, "expiredAt must not be null!");
+        Objects.requireNonNull(discountType, "discountType must not be null!");
+        Objects.requireNonNull(issuerType, "issuerType must not be null!");
+        Objects.requireNonNull(issuerId, "issuerId must not be null!");
+
+        return internalBuilder()
+            .name(name)
+            .amount(amount)
+            .expiredAt(expiredAt)
+            .discountType(discountType)
+            .issuerType(issuerType)
+            .issuerId(issuerId);
+    }
 }
