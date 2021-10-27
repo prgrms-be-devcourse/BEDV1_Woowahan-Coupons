@@ -2,10 +2,12 @@ package com.coumin.woowahancoupons.domain;
 
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "customers")
@@ -18,4 +20,8 @@ public class Customer extends BaseEntity {
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    public Customer(String email) {
+        this.email = email;
+    }
 }
