@@ -3,6 +3,7 @@ package com.coumin.woowahancoupons.domain;
 import lombok.*;
 import javax.persistence.*;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="stores")
 @Entity
@@ -19,4 +20,8 @@ public class Store extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
+
+    public Store(String name) {
+        this.name = name;
+    }
 }
