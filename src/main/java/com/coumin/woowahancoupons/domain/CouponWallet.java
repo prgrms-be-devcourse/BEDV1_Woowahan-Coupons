@@ -22,8 +22,8 @@ public class CouponWallet {
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime usedAt;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime expiredAt;
+    @Embedded
+    private ExpirationPeriod expirationPeriod;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id", nullable = false)
