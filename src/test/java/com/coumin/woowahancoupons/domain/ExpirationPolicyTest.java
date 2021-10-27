@@ -13,9 +13,9 @@ class ExpirationPolicyTest {
     @DisplayName("지정된 기간과 시간을 쿠폰의 유효기간으로 하는 만료 정책 객체 생성 성공")
     void byPeriodTypeBuilderSuccessTest() {
         //Given
-        var startAt = LocalDateTime.now();
-        var expiredAt = LocalDateTime.now().plusDays(7);
-        var expirationPolicyType = ExpirationPolicyType.PERIOD;
+        LocalDateTime startAt = LocalDateTime.now();
+        LocalDateTime expiredAt = LocalDateTime.now().plusDays(7);
+        ExpirationPolicyType expirationPolicyType = ExpirationPolicyType.PERIOD;
 
         //When
         ExpirationPolicy expirationPolicy = ExpirationPolicy.ByPeriodTypeBuilder()
@@ -38,8 +38,8 @@ class ExpirationPolicyTest {
     @DisplayName("조건에 맞지 않는 경우, 지정된 기간과 시간을 쿠폰의 유효기간으로 하는 만료 정책 객체 생성 실패가 정상")
     void byPeriodTypeBuilderFailTest() {
         //Given
-        var startAt = LocalDateTime.now();
-        var expiredAt = LocalDateTime.now().plusDays(7);
+        LocalDateTime startAt = LocalDateTime.now();
+        LocalDateTime expiredAt = LocalDateTime.now().plusDays(7);
 
         //When, Then
         assertThatIllegalArgumentException().isThrownBy(() -> {
@@ -75,11 +75,11 @@ class ExpirationPolicyTest {
     @DisplayName("실제 쿠폰 발급일시를 기준으로 지정된 기간을 쿠폰의 유효기간으로 하는 만료 정책 객체 생성 성공")
     void byAfterIssueDateTypeBuilderSuccessTest() {
         //Given
-        var expirationPolicyType = ExpirationPolicyType.AFTER_ISSUE_DATE;
-        var days = 7;
+        ExpirationPolicyType expirationPolicyType = ExpirationPolicyType.AFTER_ISSUE_DATE;
+        int days = 7;
 
         //When
-        var expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
+        ExpirationPolicy expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
             .expirationPolicyType(expirationPolicyType)
             .daysFromIssuance(days)
             .build();
@@ -97,7 +97,7 @@ class ExpirationPolicyTest {
     @DisplayName("조건에 맞지 않는 경우, 실제 쿠폰 발급일시를 기준으로 지정된 기간을 쿠폰의 유효기간으로 하는 만료 정책 객체 생성 실패")
     void byAfterIssueDateTypeBuilderFailTest() {
         //Given
-        var days = Integer.valueOf(7);
+        int days = 7;
 
         //When, Then
         assertThatIllegalArgumentException().isThrownBy(() -> {

@@ -1,6 +1,7 @@
 package com.coumin.woowahancoupons.coupon.service;
 
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
+import com.coumin.woowahancoupons.domain.Coupon;
 import com.coumin.woowahancoupons.domain.CouponRepository;
 import com.coumin.woowahancoupons.domain.StoreRepository;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
@@ -32,7 +33,7 @@ public class SimpleCouponService implements CouponService {
             throw new StoreNotFoundException(String.format("store(%d)", storeId));
         }
 
-        var coupons = requestDtoList.stream()
+        ArrayList<Coupon> coupons = requestDtoList.stream()
             .map(requestDto -> requestDto.toEntity(storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);

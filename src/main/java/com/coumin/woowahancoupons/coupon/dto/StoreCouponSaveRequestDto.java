@@ -29,7 +29,7 @@ public class StoreCouponSaveRequestDto {
     }
 
     public Coupon toEntity(Long issuerId) {
-        var expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
+        ExpirationPolicy expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
             .expirationPolicyType(ExpirationPolicyType.AFTER_ISSUE_DATE)
             .daysFromIssuance(daysAfterIssuance)
             .build();

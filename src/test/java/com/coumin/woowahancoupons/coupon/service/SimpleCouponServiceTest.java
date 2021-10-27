@@ -1,8 +1,10 @@
 package com.coumin.woowahancoupons.coupon.service;
 
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
+import com.coumin.woowahancoupons.domain.Coupon;
 import com.coumin.woowahancoupons.domain.CouponRepository;
 import com.coumin.woowahancoupons.domain.Store;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
@@ -30,8 +32,8 @@ class SimpleCouponServiceTest {
     @DisplayName("매장의 쿠폰 생성 성공")
     void saveAllStoreCouponsTest() {
         //Given
-        var store = createStore();
-        var requestDtoList = IntStream.range(0, 5)
+        Store store = createStore();
+        List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
             .mapToObj(i -> StoreCouponSaveRequestDto.builder()
                 .name("name#" + i)
                 .amount(1000L * (i + 1))
@@ -44,7 +46,7 @@ class SimpleCouponServiceTest {
         couponService.saveAllStoreCoupons(store.getId(), requestDtoList);
 
         //Then
-        var foundCoupons = couponRepository.findByIssuerId(store.getId());
+        List<Coupon> foundCoupons = couponRepository.findByIssuerId(store.getId());
         SoftAssertions.assertSoftly(softAssertions -> {
                 softAssertions.assertThat(foundCoupons).hasSize(5);
                 softAssertions.assertThat(foundCoupons.get(0)).isNotNull();
@@ -56,7 +58,7 @@ class SimpleCouponServiceTest {
     }
 
     private Store createStore() {
-        var store = new Store("store#1");
+        Store store = new Store("store#1");
         entityManager.persist(store);
         return store;
     }
