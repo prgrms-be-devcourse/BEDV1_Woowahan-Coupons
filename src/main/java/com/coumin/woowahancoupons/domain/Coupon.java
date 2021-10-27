@@ -41,6 +41,9 @@ public class Coupon extends BaseEntity {
     @Column(name = "max_cnt")
     private Integer maxCount;
 
+    @Column(name = "allocated_cnt")
+    private Integer allocatedCount;
+
     @Column(name = "max_cnt_per_cus")
     private Integer maxCountPerCustomer;
 
