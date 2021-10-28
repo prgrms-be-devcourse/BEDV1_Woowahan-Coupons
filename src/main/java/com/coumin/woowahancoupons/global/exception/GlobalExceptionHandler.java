@@ -1,5 +1,6 @@
-package com.coumin.woowahancoupons.global;
+package com.coumin.woowahancoupons.global.exception;
 
+import com.coumin.woowahancoupons.global.ApiResponse;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.coumin.woowahancoupons.global.exception.BusinessException;
 import java.util.Arrays;
