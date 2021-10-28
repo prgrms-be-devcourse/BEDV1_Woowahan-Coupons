@@ -1,5 +1,6 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.store;
 
+import com.coumin.woowahancoupons.domain.BaseEntity;
 import lombok.*;
 import javax.persistence.*;
 import java.util.*;

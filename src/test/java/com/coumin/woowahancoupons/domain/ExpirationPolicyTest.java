@@ -2,6 +2,8 @@ package com.coumin.woowahancoupons.domain;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
+import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
 import java.time.LocalDateTime;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;

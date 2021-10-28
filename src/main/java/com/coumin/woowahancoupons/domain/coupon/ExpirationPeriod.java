@@ -1,4 +1,4 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.coupon;
 
 import java.time.LocalDateTime;
 import javax.persistence.Column;

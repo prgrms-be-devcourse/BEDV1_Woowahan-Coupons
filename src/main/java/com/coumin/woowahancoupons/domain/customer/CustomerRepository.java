@@ -1,4 +1,4 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
