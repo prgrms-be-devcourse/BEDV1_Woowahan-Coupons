@@ -1,7 +1,11 @@
 package com.coumin.woowahancoupons.coupon.dto;
 
 
-import com.coumin.woowahancoupons.domain.*;
+import com.coumin.woowahancoupons.domain.coupon.Coupon;
+import com.coumin.woowahancoupons.domain.coupon.DiscountType;
+import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
+import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
+import com.coumin.woowahancoupons.domain.coupon.IssuerType;
 import lombok.*;
 
 @Getter

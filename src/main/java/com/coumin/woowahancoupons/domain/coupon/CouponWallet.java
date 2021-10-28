@@ -1,5 +1,7 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.coupon;
 
+import com.coumin.woowahancoupons.domain.customer.Customer;
+import com.coumin.woowahancoupons.domain.Order;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;

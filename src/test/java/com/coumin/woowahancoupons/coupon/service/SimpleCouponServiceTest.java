@@ -2,9 +2,9 @@ package com.coumin.woowahancoupons.coupon.service;
 
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
-import com.coumin.woowahancoupons.domain.Coupon;
-import com.coumin.woowahancoupons.domain.CouponRepository;
-import com.coumin.woowahancoupons.domain.Store;
+import com.coumin.woowahancoupons.domain.coupon.Coupon;
+import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
+import com.coumin.woowahancoupons.domain.store.Store;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

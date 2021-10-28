@@ -1,9 +1,9 @@
 package com.coumin.woowahancoupons.coupon.service;
 
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
-import com.coumin.woowahancoupons.domain.Coupon;
-import com.coumin.woowahancoupons.domain.CouponRepository;
-import com.coumin.woowahancoupons.domain.StoreRepository;
+import com.coumin.woowahancoupons.domain.coupon.Coupon;
+import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
+import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;

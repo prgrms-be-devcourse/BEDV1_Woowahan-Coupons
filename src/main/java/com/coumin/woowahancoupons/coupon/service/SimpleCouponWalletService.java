@@ -1,9 +1,9 @@
 package com.coumin.woowahancoupons.coupon.service;
 
-import com.coumin.woowahancoupons.domain.CouponWallet;
-import com.coumin.woowahancoupons.domain.CouponWalletRepository;
-import com.coumin.woowahancoupons.domain.Customer;
-import com.coumin.woowahancoupons.domain.CustomerRepository;
+import com.coumin.woowahancoupons.domain.coupon.CouponWallet;
+import com.coumin.woowahancoupons.domain.coupon.CouponWalletRepository;
+import com.coumin.woowahancoupons.domain.customer.Customer;
+import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

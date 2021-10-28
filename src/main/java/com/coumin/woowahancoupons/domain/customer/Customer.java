@@ -1,6 +1,7 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.customer;
 
 
+import com.coumin.woowahancoupons.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
