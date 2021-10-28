@@ -2,6 +2,7 @@ package com.coumin.woowahancoupons.global.error;
 
 public enum ErrorCode {
 
+    UNEXPECTED(-1, "-1", "Unexpected exception occurred"),
     ENTITY_NOT_FOUND(400, "C001", " Entity Not Found");
 
     private final int status;
