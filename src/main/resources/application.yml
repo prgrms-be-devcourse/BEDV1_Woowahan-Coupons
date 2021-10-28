@@ -18,7 +18,8 @@ spring:
         query.in_clause_parameter_padding: true
         storage_engin: innodb
         hbm2ddl:
-          auto: create-drop
+          auto: create
+        show_sql: false
         format_sql: true
 
 logging.level:

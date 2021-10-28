@@ -2,7 +2,6 @@ package com.coumin.woowahancoupons.domain;
 
 import lombok.*;
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -22,12 +21,10 @@ public class Coupon extends BaseEntity {
     @Column(nullable = false)
     private Long amount;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime startAt;
+    @Embedded
+    private ExpirationPolicy expirationPolicy;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime expiredAt;
-
+    @Column(name = "min_order_price")
     private Long minOrderPrice;
 
     @Enumerated(EnumType.STRING)
@@ -57,15 +54,14 @@ public class Coupon extends BaseEntity {
     private final List<CouponWallet> couponWallets = new ArrayList<>();
 
     @Builder(builderMethodName = "internalBuilder")
-    private Coupon(Long id, String name, Long amount, LocalDateTime startAt,
-        LocalDateTime expiredAt, Long minOrderPrice,
+    private Coupon(Long id, String name, Long amount,
+        ExpirationPolicy expirationPolicy, Long minOrderPrice,
         DiscountType discountType, IssuerType issuerType, Long issuerId, Integer maxCount,
         Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode) {
         this.id = id;
         this.name = name;
         this.amount = amount;
-        this.startAt = startAt;
-        this.expiredAt = expiredAt;
+        this.expirationPolicy = expirationPolicy;
         this.minOrderPrice = minOrderPrice;
         this.discountType = discountType;
         this.issuerType = issuerType;
@@ -76,12 +72,17 @@ public class Coupon extends BaseEntity {
         this.promotionCode = promotionCode;
     }
 
-    public static CouponBuilder builder(String name, Long amount, LocalDateTime expiredAt,
-        DiscountType discountType, IssuerType issuerType, Long issuerId) {
-
+    public static CouponBuilder builder(
+        String name,
+        Long amount,
+        ExpirationPolicy expirationPolicy,
+        DiscountType discountType,
+        IssuerType issuerType,
+        Long issuerId
+    ) {
         Objects.requireNonNull(name, "name must not be null!");
         Objects.requireNonNull(amount, "amount must not be null!");
-        Objects.requireNonNull(expiredAt, "expiredAt must not be null!");
+        Objects.requireNonNull(expirationPolicy, "expirationPolicy must not be null!");
         Objects.requireNonNull(discountType, "discountType must not be null!");
         Objects.requireNonNull(issuerType, "issuerType must not be null!");
         Objects.requireNonNull(issuerId, "issuerId must not be null!");
@@ -89,7 +90,7 @@ public class Coupon extends BaseEntity {
         return internalBuilder()
             .name(name)
             .amount(amount)
-            .expiredAt(expiredAt)
+            .expirationPolicy(expirationPolicy)
             .discountType(discountType)
             .issuerType(issuerType)
             .issuerId(issuerId);
