@@ -1,5 +1,6 @@
 package com.coumin.woowahancoupons.coupon.service;
 
+import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.Coupon;
 import com.coumin.woowahancoupons.domain.CouponRepository;
@@ -33,8 +34,8 @@ class SimpleCouponServiceTest {
     void saveAllStoreCouponsTest() {
         //Given
         Store store = createStore();
-        List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
-            .mapToObj(i -> StoreCouponSaveRequestDto.builder()
+        List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
+            .mapToObj(i -> StoreCouponSaveDto.builder()
                 .name("name#" + i)
                 .amount(1000L * (i + 1))
                 .daysAfterIssuance(30)
@@ -43,7 +44,9 @@ class SimpleCouponServiceTest {
             .collect(Collectors.toList());
 
         //When
-        couponService.saveAllStoreCoupons(store.getId(), requestDtoList);
+        couponService.saveAllStoreCoupons(
+            store.getId(),
+            new StoreCouponSaveRequestDto(storeCouponSaveDtos));
 
         //Then
         List<Coupon> foundCoupons = couponRepository.findByIssuerId(store.getId());

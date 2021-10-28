@@ -1,48 +1,17 @@
 package com.coumin.woowahancoupons.coupon.dto;
 
+import java.util.List;
 
-import com.coumin.woowahancoupons.domain.*;
-import lombok.*;
-
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreCouponSaveRequestDto {
 
-    private String name;
+    private final List<StoreCouponSaveDto> storeCouponSaveDtos;
 
-    private Long amount;
-
-    private Integer daysAfterIssuance;
-
-    private Long minOrderPrice;
-
-    @Builder
     public StoreCouponSaveRequestDto(
-        String name,
-        Long amount,
-        Integer daysAfterIssuance,
-        Long minOrderPrice) {
-        this.name = name;
-        this.amount = amount;
-        this.daysAfterIssuance = daysAfterIssuance;
-        this.minOrderPrice = minOrderPrice;
+        List<StoreCouponSaveDto> storeCouponSaveDtos) {
+        this.storeCouponSaveDtos = storeCouponSaveDtos;
     }
 
-    public Coupon toEntity(Long issuerId) {
-        ExpirationPolicy expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
-            .expirationPolicyType(ExpirationPolicyType.AFTER_ISSUE_DATE)
-            .daysFromIssuance(daysAfterIssuance)
-            .build();
-
-        return Coupon.builder(
-            name,
-            amount,
-            expirationPolicy,
-            DiscountType.FIXED_AMOUNT,
-            IssuerType.STORE,
-            issuerId)
-            .minOrderPrice(minOrderPrice)
-            .maxCountPerCustomer(1)
-            .build();
+    public List<StoreCouponSaveDto> getStoreCouponSaveDtos() {
+        return storeCouponSaveDtos;
     }
 }

@@ -10,10 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExpirationPeriod {
 
-    @Column(columnDefinition = "TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime startAt;
 
-    @Column(columnDefinition = "TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime expiredAt;
 
+    public ExpirationPeriod(LocalDateTime startAt, LocalDateTime expiredAt) {
+        this.startAt = startAt;
+        this.expiredAt = expiredAt;
+    }
 }

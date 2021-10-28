@@ -54,7 +54,7 @@ public class Coupon extends BaseEntity {
     private final List<CouponWallet> couponWallets = new ArrayList<>();
 
     @Builder(builderMethodName = "internalBuilder")
-    public Coupon(Long id, String name, Long amount,
+    private Coupon(Long id, String name, Long amount,
         ExpirationPolicy expirationPolicy, Long minOrderPrice,
         DiscountType discountType, IssuerType issuerType, Long issuerId, Integer maxCount,
         Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode) {

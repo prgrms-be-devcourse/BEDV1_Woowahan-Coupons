@@ -34,9 +34,9 @@ public class ExpirationPolicy {
     public ExpirationPolicy(ExpirationPolicyType expirationPolicyType, LocalDateTime startAt,
         LocalDateTime expiredAt) {
         Assert.notNull(expirationPolicyType, "expirationPolicyType must not be null");
-        Assert.isTrue(expirationPolicyType == ExpirationPolicyType.PERIOD, "invalid expirationPolicyType");
         Assert.notNull(startAt, "startAt must not be null");
         Assert.notNull(expiredAt, "expiredAt must not be null");
+        Assert.isTrue(expirationPolicyType == ExpirationPolicyType.PERIOD, "invalid expirationPolicyType");
 
         this.expirationPolicyType = expirationPolicyType;
         this.startAt = startAt;
@@ -48,8 +48,8 @@ public class ExpirationPolicy {
         ExpirationPolicyType expirationPolicyType,
         Integer daysFromIssuance) {
         Assert.notNull(expirationPolicyType, "expirationPolicyType must not be null");
-        Assert.isTrue(expirationPolicyType == ExpirationPolicyType.AFTER_ISSUE_DATE, "invalid expirationPolicyType");
         Assert.notNull(daysFromIssuance, "daysFromIssuance must not be null");
+        Assert.isTrue(expirationPolicyType == ExpirationPolicyType.AFTER_ISSUE_DATE, "invalid expirationPolicyType");
 
         this.expirationPolicyType = expirationPolicyType;
         this.daysFromIssuance = daysFromIssuance;

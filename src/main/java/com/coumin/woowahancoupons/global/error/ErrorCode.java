@@ -1,8 +1,5 @@
 package com.coumin.woowahancoupons.global.error;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorCode {
 
     ENTITY_NOT_FOUND(400, "C001", " Entity Not Found");
