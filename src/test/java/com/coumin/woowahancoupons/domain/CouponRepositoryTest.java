@@ -91,10 +91,7 @@ class CouponRepositoryTest {
 
 	private List<Coupon> createCoupons(IssuerType issuerType, long issuerId, int size) {
 
-		ExpirationPolicy expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
-			.expirationPolicyType(ExpirationPolicyType.AFTER_ISSUE_DATE)
-			.daysFromIssuance(14)
-			.build();
+		ExpirationPolicy expirationPolicy = ExpirationPolicy.newByAfterIssueDate(14);
 
 		return IntStream.range(0, size).mapToObj(i ->
 			Coupon.builder(
