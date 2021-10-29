@@ -12,6 +12,7 @@ import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
+import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ class SimpleCouponServiceTest {
 		//When, Then
 		assertThatThrownBy(() -> couponService.saveAllStoreCoupons(storeId, requestDto))
 			.isInstanceOf(StoreNotFoundException.class)
-			.hasMessageContaining("is not found");
+			.hasMessageContaining(ErrorCode.STORE_NOT_FOUND.getMessage());
 		verify(storeRepository, only()).existsById(storeId);
 	}
 }
