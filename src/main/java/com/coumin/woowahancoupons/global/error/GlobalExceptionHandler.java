@@ -33,11 +33,12 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
-		String fieldErrorMessage = e.getBindingResult().getFieldErrors()
+
+		String errorDetail = e.getBindingResult().getFieldErrors()
 			.stream()
 			.map(error -> String.format("%s %s", error.getField(), error.getDefaultMessage()))
 			.collect(Collectors.joining(","));
-		String errorMessage = String.format("%s: %s", errorCode.getMessage(), fieldErrorMessage);
+		String errorMessage = String.format("%s: %s", errorCode.getMessage(), errorDetail);
 		log.error("handleMethodArgumentNotValid exception occurred: {}", errorMessage, e);
 
 		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
