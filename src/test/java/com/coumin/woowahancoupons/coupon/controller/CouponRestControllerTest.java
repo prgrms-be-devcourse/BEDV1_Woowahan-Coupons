@@ -96,9 +96,9 @@ class CouponRestControllerTest {
 		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
 			.mapToObj(i -> StoreCouponSaveDto.builder()
 				.name("name#" + i)
-				.amount(0L)
-				.daysAfterIssuance(0)
-				.minOrderPrice(0L)
+				.amount(1000L * (i + 1))
+				.daysAfterIssuance(30)
+				.minOrderPrice(1000L * (i + 1))
 				.build())
 			.collect(Collectors.toList());
 		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);

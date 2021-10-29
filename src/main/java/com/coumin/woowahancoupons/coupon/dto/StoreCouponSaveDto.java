@@ -28,7 +28,7 @@ public class StoreCouponSaveDto {
 	private Long amount;
 
 	@Max(30)
-	@Positive
+	@Min(7)
 	@NotNull
 	private Integer daysAfterIssuance;
 
