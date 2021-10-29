@@ -6,6 +6,7 @@ import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class SimpleCouponService implements CouponService {
             throw new StoreNotFoundException(String.format("store(%d)", storeId));
         }
 
-        ArrayList<Coupon> coupons = requestDto.getStoreCouponSaveDtos().stream()
+        List<Coupon> coupons = requestDto.getStoreCouponSaveDtos().stream()
             .map(storeCouponSaveDto -> storeCouponSaveDto.toEntity(storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);
