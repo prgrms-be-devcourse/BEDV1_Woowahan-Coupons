@@ -4,7 +4,7 @@ public enum ErrorCode {
 
     UNEXPECTED(-1, "-1", "Unexpected exception occurred"),
     ENTITY_NOT_FOUND(400, "C001", " Entity Not Found"),
-    COUPON_WALLET_NOT_FOUND(400, "C002", "Can not find a CouponWallet for id "),
+    COUPON_REDEMPTION_NOT_FOUND(400, "C002", "Can not find a CouponRedemption for id "),
     STORE_NOT_FOUND(400, "C003", "Can not find a Store for id ");
 
     private final int status;

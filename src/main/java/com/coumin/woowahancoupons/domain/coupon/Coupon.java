@@ -52,7 +52,7 @@ public class Coupon extends BaseEntity {
     private String promotionCode;
 
     @OneToMany(mappedBy = "coupon")
-    private final List<CouponWallet> couponWallets = new ArrayList<>();
+    private final List<CouponRedemption> couponRedemptions = new ArrayList<>();
 
     @Builder(builderMethodName = "internalBuilder")
     private Coupon(Long id, String name, Long amount,

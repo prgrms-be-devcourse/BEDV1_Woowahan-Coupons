@@ -9,13 +9,13 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "coupon_wallet")
+@Table(name = "coupon_redemptions")
 @Entity
-public class CouponWallet {
+public class CouponRedemption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "coupon_wallet_id")
+    @Column(name = "coupon_redemption_id")
     private UUID id;
 
     @Column(name = "use_yn", nullable = false)
@@ -39,7 +39,7 @@ public class CouponWallet {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    public CouponWallet(Coupon coupon) {
+    public CouponRedemption(Coupon coupon) {
         this.coupon = coupon;
     }
 
