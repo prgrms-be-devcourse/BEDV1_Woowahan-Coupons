@@ -30,7 +30,7 @@ public class SimpleCouponService implements CouponService {
     @Override
     public void saveAllStoreCoupons(Long storeId, StoreCouponSaveRequestDto requestDto) {
         if (!storeRepository.existsById(storeId)) {
-            throw new StoreNotFoundException(String.format("store(%d)", storeId));
+            throw new StoreNotFoundException(storeId);
         }
 
         List<Coupon> coupons = requestDto.getStoreCouponSaveDtos().stream()
