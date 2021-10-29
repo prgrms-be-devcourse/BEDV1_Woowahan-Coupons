@@ -7,7 +7,7 @@ import java.util.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "coupons")
+@Table(name = "coupons", indexes = @Index(name = "coupon_idx", columnList = "issuer_id"))
 @Entity
 public class Coupon extends BaseEntity {
 
@@ -16,10 +16,10 @@ public class Coupon extends BaseEntity {
     @Column(name = "coupon_id")
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "amount", nullable = false)
     private Long amount;
 
     @Embedded
@@ -29,14 +29,14 @@ public class Coupon extends BaseEntity {
     private Long minOrderPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @Column(name = "discount_type", nullable = false, length = 30)
     private DiscountType discountType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @Column(name = "issuer_type", nullable = false, length = 30)
     private IssuerType issuerType;
 
-    @Column(nullable = false)
+    @Column(name = "issuer_id", nullable = false)
     private Long issuerId;
 
     @Column(name = "max_cnt")
