@@ -8,8 +8,7 @@ import com.coumin.woowahancoupons.domain.coupon.IssuerType;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import lombok.*;
 
@@ -24,23 +23,18 @@ public class StoreCouponSaveDto {
 
 	@Max(10000)
 	@Min(1000)
-	@NotNull
-	private Long amount;
+	private long amount;
 
 	@Max(30)
 	@Min(7)
-	@NotNull
-	private Integer daysAfterIssuance;
+	private int daysAfterIssuance;
 
-	@Positive
-	@NotNull
+	@Max(100000)
+	@PositiveOrZero
 	private Long minOrderPrice;
 
 	@Builder
-	public StoreCouponSaveDto(
-		String name,
-		Long amount,
-		Integer daysAfterIssuance,
+	public StoreCouponSaveDto(String name, long amount, int daysAfterIssuance,
 		Long minOrderPrice) {
 		this.name = name;
 		this.amount = amount;
