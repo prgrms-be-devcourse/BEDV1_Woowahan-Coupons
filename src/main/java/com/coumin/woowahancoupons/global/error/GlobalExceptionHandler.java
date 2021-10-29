@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	protected ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+	public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
 		String fieldErrorMessage = e.getBindingResult().getFieldErrors()
 			.stream()
@@ -39,10 +40,15 @@ public class GlobalExceptionHandler {
 		String errorMessage = String.format("%s: %s", errorCode.getMessage(), fieldErrorMessage);
 		log.error("handleMethodArgumentNotValid exception occurred: {}", errorMessage, e);
 
-		return newResponseEntity(
-			errorCode.getCode(),
-			errorMessage,
-			HttpStatus.BAD_REQUEST);
+		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+		log.error("handleHttpRequestMethodNotSupportedException", e);
+		ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
+
+		return newResponseEntity(errorCode.getCode(), errorCode.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ExceptionHandler(BusinessException.class)

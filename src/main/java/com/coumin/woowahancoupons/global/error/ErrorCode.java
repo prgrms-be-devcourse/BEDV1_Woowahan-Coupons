@@ -11,7 +11,8 @@ public enum ErrorCode {
     COUPON_WALLET_NOT_FOUND(400, "C002", "Can not find a CouponWallet for id "),
     STORE_NOT_FOUND(400, "C003", "Can not find a Store for id "),
 
-    INVALID_INPUT_VALUE(400, "C004", " Invalid Input Value");
+    INVALID_INPUT_VALUE(400, "C004", " Invalid Input Value"),
+    METHOD_NOT_ALLOWED(405, "C005", " Method not allowed");
 
     private final int status;
     private final String code;
