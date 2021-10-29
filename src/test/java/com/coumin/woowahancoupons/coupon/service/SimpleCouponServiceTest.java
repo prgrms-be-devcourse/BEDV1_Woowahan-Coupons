@@ -75,11 +75,13 @@ class SimpleCouponServiceTest {
 			.collect(Collectors.toList());
 		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
 
-		given(storeRepository.existsById(any())).willThrow(StoreNotFoundException.class);
+		given(storeRepository.existsById(any()))
+			.willThrow(new StoreNotFoundException(String.format("store(%d)", storeId)));
 
 		//When, Then
 		assertThatThrownBy(() -> couponService.saveAllStoreCoupons(storeId, requestDto))
-			.isInstanceOf(StoreNotFoundException.class);
+			.isInstanceOf(StoreNotFoundException.class)
+			.hasMessageContaining("is not found");
 		verify(storeRepository, only()).existsById(storeId);
 	}
 }
