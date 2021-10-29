@@ -1,6 +1,7 @@
 package com.coumin.woowahancoupons.coupon.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,7 +65,7 @@ class CouponRestControllerTest {
 
 	@Test
 	@DisplayName("요청이 유효하지 않으면 매장의 쿠폰 생성 실패")
-	void createStoreCouponsFailTest() throws Exception {
+	void createStoreCouponsInvalidRequestValueTest() throws Exception {
 		// given
 		long storeId = storeRepository.save(new Store("testStore#1")).getId();
 		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
@@ -84,6 +85,34 @@ class CouponRestControllerTest {
 		//Then
 		resultActions
 			.andExpect(status().isBadRequest())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("요청이 유효하지 않은 메서드라면 매장의 쿠폰 생성 실패")
+	void createStoreCouponsInvalidRequestMethodTest() throws Exception {
+		// given
+		long storeId = storeRepository.save(new Store("testStore#1")).getId();
+		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
+			.mapToObj(i -> StoreCouponSaveDto.builder()
+				.name("name#" + i)
+				.amount(0L)
+				.daysAfterIssuance(0)
+				.minOrderPrice(0L)
+				.build())
+			.collect(Collectors.toList());
+		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
+
+		//When
+		ResultActions resultActions = mvc.perform(put("/api/v1/coupons/{storeId}/issuance", storeId)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(requestDto)))
+			.andDo(print());
+
+		//TODO rest docs
+		//Then
+		resultActions
+			.andExpect(status().isMethodNotAllowed())
 			.andDo(print());
 	}
 
