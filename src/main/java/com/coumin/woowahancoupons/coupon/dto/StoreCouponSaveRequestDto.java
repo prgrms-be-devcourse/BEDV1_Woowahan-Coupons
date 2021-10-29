@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class StoreCouponSaveRequestDto {
 
 	@Valid
-	@Size(max = 3)
+	@Size(min = 1, max = 3)
 	private List<StoreCouponSaveDto> storeCouponSaveDtos;
 
 	public StoreCouponSaveRequestDto(List<StoreCouponSaveDto> storeCouponSaveDtos) {

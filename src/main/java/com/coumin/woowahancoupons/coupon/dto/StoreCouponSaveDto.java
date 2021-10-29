@@ -5,6 +5,8 @@ import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.DiscountType;
 import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
 import com.coumin.woowahancoupons.domain.coupon.IssuerType;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -15,20 +17,23 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreCouponSaveDto {
 
-	@NotEmpty
 	@Size(min = 2, max = 100)
+	@NotEmpty
 	private String name;
 
+
+	@Max(10000)
+	@Min(1000)
 	@NotNull
-	@Positive
 	private Long amount;
 
-	@NotNull
+	@Max(30)
 	@Positive
+	@NotNull
 	private Integer daysAfterIssuance;
 
-	@NotNull
 	@Positive
+	@NotNull
 	private Long minOrderPrice;
 
 	@Builder
