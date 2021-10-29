@@ -60,7 +60,7 @@ class SimpleCouponServiceTest {
 		verify(couponRepository, times(1)).saveAll(anyList());
 	}
 
-	@Test()
+	@Test
 	@DisplayName("매장 id가 유효하지 않으면, 매장의 쿠폰 생성 실패")
 	void saveAllStoreCouponsFailTest() {
 		//Given

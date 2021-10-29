@@ -71,8 +71,8 @@ class CouponRepositoryTest {
 	@DisplayName("발행인의 아이디로 쿠폰 조회 테스트")
 	void findCouponByIssuerIdTest() {
 		//Given
-		long adminId = 1L;
-		List<Coupon> coupons1 = createCoupons(IssuerType.ADMIN, adminId, 3);
+		long issuerId = 1L;
+		List<Coupon> coupons1 = createCoupons(IssuerType.ADMIN, issuerId, 3);
 		List<Coupon> coupons2 = createCoupons(IssuerType.STORE, 2L, 3);
 
 		coupons1.forEach(coupon -> entityManager.persist(coupon));
@@ -80,7 +80,7 @@ class CouponRepositoryTest {
 		entityManager.clear();
 
 		//When
-		List<Coupon> allCouponsCreatedByAdmin = couponRepository.findByIssuerId(adminId);
+		List<Coupon> allCouponsCreatedByAdmin = couponRepository.findByIssuerId(issuerId);
 
 		//Then
 		SoftAssertions.assertSoftly(softAssertions -> {
