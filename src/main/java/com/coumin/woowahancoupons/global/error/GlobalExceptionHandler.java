@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
 		String errorDetail = e.getBindingResult().getFieldErrors().stream()
 			.map(error -> String.format("%s %s", error.getField(), error.getDefaultMessage()))
 			.collect(Collectors.joining(","));
-		String errorMessage = String.format("%s: %s", errorCode.getMessage(), errorDetail);
+		String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
 		log.error("handleMethodArgumentNotValid exception occurred: {}", errorMessage, e);
 
 		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
