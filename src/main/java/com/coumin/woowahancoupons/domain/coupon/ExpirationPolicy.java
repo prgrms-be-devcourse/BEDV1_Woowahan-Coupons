@@ -30,28 +30,23 @@ public class ExpirationPolicy {
     @Column(name = "days_from_issuance")
     private Integer daysFromIssuance;
 
-    @Builder(builderClassName = "ByPeriodTypeBuilder", builderMethodName = "ByPeriodTypeBuilder")
-    public ExpirationPolicy(ExpirationPolicyType expirationPolicyType, LocalDateTime startAt,
-        LocalDateTime expiredAt) {
-        Assert.notNull(expirationPolicyType, "expirationPolicyType must not be null");
-        Assert.notNull(startAt, "startAt must not be null");
-        Assert.notNull(expiredAt, "expiredAt must not be null");
-        Assert.isTrue(expirationPolicyType == ExpirationPolicyType.PERIOD, "invalid expirationPolicyType");
-
+    private ExpirationPolicy(
+        ExpirationPolicyType expirationPolicyType, LocalDateTime startAt,
+        LocalDateTime expiredAt, Integer daysFromIssuance) {
         this.expirationPolicyType = expirationPolicyType;
         this.startAt = startAt;
         this.expiredAt = expiredAt;
+        this.daysFromIssuance = daysFromIssuance;
     }
 
-    @Builder(builderClassName = "ByAfterIssueDateTypeBuilder", builderMethodName = "ByAfterIssueDateTypeBuilder")
-    public ExpirationPolicy(
-        ExpirationPolicyType expirationPolicyType,
-        Integer daysFromIssuance) {
-        Assert.notNull(expirationPolicyType, "expirationPolicyType must not be null");
+    public static ExpirationPolicy newByAfterIssueDate(Integer daysFromIssuance) {
         Assert.notNull(daysFromIssuance, "daysFromIssuance must not be null");
-        Assert.isTrue(expirationPolicyType == ExpirationPolicyType.AFTER_ISSUE_DATE, "invalid expirationPolicyType");
+        return new ExpirationPolicy(ExpirationPolicyType.AFTER_ISSUE_DATE, null, null, daysFromIssuance);
+    }
 
-        this.expirationPolicyType = expirationPolicyType;
-        this.daysFromIssuance = daysFromIssuance;
+    public static ExpirationPolicy newByPeriod(LocalDateTime startAt, LocalDateTime expiredAt) {
+        Assert.notNull(startAt, "startAt must not be null");
+        Assert.notNull(expiredAt, "expiredAt must not be null");
+        return new ExpirationPolicy(ExpirationPolicyType.PERIOD, startAt, expiredAt, null);
     }
 }

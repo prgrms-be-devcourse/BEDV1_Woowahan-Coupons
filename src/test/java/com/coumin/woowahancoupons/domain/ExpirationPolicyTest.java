@@ -20,11 +20,7 @@ class ExpirationPolicyTest {
         ExpirationPolicyType expirationPolicyType = ExpirationPolicyType.PERIOD;
 
         //When
-        ExpirationPolicy expirationPolicy = ExpirationPolicy.ByPeriodTypeBuilder()
-            .expirationPolicyType(expirationPolicyType)
-            .startAt(startAt)
-            .expiredAt(expiredAt)
-            .build();
+        ExpirationPolicy expirationPolicy = ExpirationPolicy.newByPeriod(startAt, expiredAt);
 
         //Then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -45,31 +41,11 @@ class ExpirationPolicyTest {
 
         //When, Then
         assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByPeriodTypeBuilder()
-                .expiredAt(startAt)
-                .build();
-        }).withMessage("expirationPolicyType must not be null");
-
-        assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByPeriodTypeBuilder()
-                .expirationPolicyType(ExpirationPolicyType.AFTER_ISSUE_DATE)
-                .startAt(startAt)
-                .expiredAt(expiredAt)
-                .build();
-        }).withMessage("invalid expirationPolicyType");
-
-        assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByPeriodTypeBuilder()
-                .expirationPolicyType(ExpirationPolicyType.PERIOD)
-                .expiredAt(expiredAt)
-                .build();
+            ExpirationPolicy.newByPeriod(null, expiredAt);
         }).withMessage("startAt must not be null");
 
         assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByPeriodTypeBuilder()
-                .expirationPolicyType(ExpirationPolicyType.PERIOD)
-                .startAt(startAt)
-                .build();
+            ExpirationPolicy.newByPeriod(startAt, null);
         }).withMessage("expiredAt must not be null");
     }
 
@@ -81,15 +57,11 @@ class ExpirationPolicyTest {
         int days = 7;
 
         //When
-        ExpirationPolicy expirationPolicy = ExpirationPolicy.ByAfterIssueDateTypeBuilder()
-            .expirationPolicyType(expirationPolicyType)
-            .daysFromIssuance(days)
-            .build();
+        ExpirationPolicy expirationPolicy = ExpirationPolicy.newByAfterIssueDate(days);
 
         //Then
         SoftAssertions.assertSoftly(softAssertions -> {
-                softAssertions.assertThat(expirationPolicy.getExpirationPolicyType())
-                    .isEqualTo(expirationPolicyType);
+                softAssertions.assertThat(expirationPolicy.getExpirationPolicyType()).isEqualTo(expirationPolicyType);
                 softAssertions.assertThat(expirationPolicy.getDaysFromIssuance()).isEqualTo(days);
             }
         );
@@ -98,27 +70,8 @@ class ExpirationPolicyTest {
     @Test
     @DisplayName("조건에 맞지 않는 경우, 실제 쿠폰 발급일시를 기준으로 지정된 기간을 쿠폰의 유효기간으로 하는 만료 정책 객체 생성 실패")
     void byAfterIssueDateTypeBuilderFailTest() {
-        //Given
-        int days = 7;
-
-        //When, Then
         assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByAfterIssueDateTypeBuilder()
-                .daysFromIssuance(days)
-                .build();
-        }).withMessage("expirationPolicyType must not be null");
-
-        assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByAfterIssueDateTypeBuilder()
-                .expirationPolicyType(ExpirationPolicyType.PERIOD)
-                .daysFromIssuance(days)
-                .build();
-        }).withMessage("invalid expirationPolicyType");
-
-        assertThatIllegalArgumentException().isThrownBy(() -> {
-            ExpirationPolicy.ByAfterIssueDateTypeBuilder()
-                .expirationPolicyType(ExpirationPolicyType.AFTER_ISSUE_DATE)
-                .build();
+            ExpirationPolicy.newByAfterIssueDate(null);
         }).withMessage("daysFromIssuance must not be null");
     }
 }
