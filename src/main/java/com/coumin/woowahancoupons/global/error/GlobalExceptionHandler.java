@@ -5,6 +5,7 @@ import com.coumin.woowahancoupons.global.exception.BusinessException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,20 @@ public class GlobalExceptionHandler {
 			.map(error -> String.format("%s %s", error.getField(), error.getDefaultMessage()))
 			.collect(Collectors.joining(","));
 		String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
-		log.error("handleMethodArgumentNotValid exception occurred: {}", errorMessage, e);
+		log.error("MethodArgumentNotValid exception occurred: {}", errorMessage);
+
+		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ApiResponse<?>>  handleConstraintViolationException(ConstraintViolationException e) {
+		ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+
+		String errorDetail = e.getConstraintViolations().stream()
+			.map(x -> String.format("%s %s", x.getPropertyPath().toString(), x.getMessage()))
+			.collect(Collectors.joining());
+		String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
+		log.error("ConstraintViolationException exception occurred: {}", errorMessage);
 
 		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
 	}

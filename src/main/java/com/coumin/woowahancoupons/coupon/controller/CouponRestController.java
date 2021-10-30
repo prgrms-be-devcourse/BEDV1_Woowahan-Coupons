@@ -5,13 +5,17 @@ import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.coupon.service.CouponService;
 import com.coumin.woowahancoupons.global.ApiResponse;
+import java.util.List;
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("api/v1/coupons")
 public class CouponRestController {
@@ -25,7 +29,7 @@ public class CouponRestController {
     @PostMapping("/{storeId}/issuance")
     public ApiResponse<Object> createStoreCoupons(
         @PathVariable long storeId,
-        @RequestBody @Valid StoreCouponSaveRequestDto storeCouponSaveRequestDto) {
+        @RequestBody @Size(min = 1, max = 3) List<@Valid StoreCouponSaveRequestDto> storeCouponSaveRequestDto ) {
 
         couponService.saveAllStoreCoupons(storeId, storeCouponSaveRequestDto);
         return ApiResponse.success();

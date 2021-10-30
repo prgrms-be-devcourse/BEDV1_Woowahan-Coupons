@@ -8,7 +8,6 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
@@ -41,20 +40,19 @@ class SimpleCouponServiceTest {
 	void saveAllStoreCouponsSuccessTest() {
 		//Given
 		long storeId = 1L;
-		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
-			.mapToObj(i -> StoreCouponSaveDto.builder()
+		List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
+			.mapToObj(i -> StoreCouponSaveRequestDto.builder()
 				.name("name#" + i)
 				.amount(1000L * (i + 1))
 				.daysAfterIssuance(30)
 				.minOrderPrice(1000L * (i + 1))
 				.build())
 			.collect(Collectors.toList());
-		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
 
 		given(storeRepository.existsById(storeId)).willReturn(true);
 
 		//When
-		couponService.saveAllStoreCoupons(storeId, requestDto);
+		couponService.saveAllStoreCoupons(storeId, requestDtoList);
 
 		//Then
 		verify(storeRepository, times(1)).existsById(storeId);
@@ -66,20 +64,19 @@ class SimpleCouponServiceTest {
 	void saveAllStoreCouponsFailTest() {
 		//Given
 		long storeId = 1L;
-		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
-			.mapToObj(i -> StoreCouponSaveDto.builder()
+		List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
+			.mapToObj(i -> StoreCouponSaveRequestDto.builder()
 				.name("name#" + i)
 				.amount(1000L * (i + 1))
 				.daysAfterIssuance(30)
 				.minOrderPrice(1000L * (i + 1))
 				.build())
 			.collect(Collectors.toList());
-		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
 
 		given(storeRepository.existsById(any())).willReturn(false);
 
 		//When, Then
-		assertThatThrownBy(() -> couponService.saveAllStoreCoupons(storeId, requestDto))
+		assertThatThrownBy(() -> couponService.saveAllStoreCoupons(storeId, requestDtoList))
 			.isInstanceOf(StoreNotFoundException.class)
 			.hasMessageContaining(ErrorCode.STORE_NOT_FOUND.getMessage());
 		verify(storeRepository, only()).existsById(storeId);

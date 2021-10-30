@@ -33,13 +33,12 @@ public class SimpleCouponService implements CouponService {
     }
 
     @Transactional
-    @Override
-    public void saveAllStoreCoupons(Long storeId, StoreCouponSaveRequestDto requestDto) {
+    public void saveAllStoreCoupons(Long storeId, List<StoreCouponSaveRequestDto> requestDtoList) {
         if (!storeRepository.existsById(storeId)) {
             throw new StoreNotFoundException(storeId);
         }
 
-        List<Coupon> coupons = requestDto.getStoreCouponSaveDtos().stream()
+        List<Coupon> coupons = requestDtoList.stream()
             .map(storeCouponSaveDto -> storeCouponSaveDto.toEntity(storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);
