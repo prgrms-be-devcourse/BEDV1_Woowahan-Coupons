@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CouponCreateConverter {
 
-    public Coupon convertToCoupon(CouponCreateRequest dto) {
+    public Coupon convertToCoupon(CouponCreateRequestDto dto) {
 
         ExpirationPolicy expirationPolicy;
 
@@ -20,36 +20,33 @@ public class CouponCreateConverter {
             expirationPolicy = ExpirationPolicy.newByAfterIssueDate(dto.getDaysFromIssuance());
         }
 
-        return Coupon.internalBuilder()
-            .name(dto.getName())
-            .amount(dto.getAmount())
-            .expirationPolicy(expirationPolicy)
+        return Coupon.builder(dto.getName(),
+                dto.getAmount(),
+                expirationPolicy,
+                DiscountType.valueOf(dto.getDiscountType()),
+                IssuerType.valueOf(dto.getIssuerType()),
+                dto.getIssuerId())
             .minOrderPrice(dto.getMinOrderPrice())
-            .discountType(DiscountType.valueOf(dto.getDiscountType()))
-            .issuerType(IssuerType.valueOf(dto.getIssuerType()))
-            .issuerId(dto.getIssuerId())
             .maxCount(dto.getMaxCount())
             .allocatedCount(dto.getAllocatedCount())
             .maxCountPerCustomer(dto.getMaxCountPerCustomer())
             .promotionCode(dto.getPromotionCod())
             .build();
-
     }
 
-    public CouponCreateResponse convertToCouponCreateResponse(Coupon coupon) {
-        return CouponCreateResponse.builder()
+    public CouponCreateResponseDto convertToCouponCreateResponse(Coupon coupon) {
+        return CouponCreateResponseDto.builder()
             .name(coupon.getName())
             .amount(coupon.getAmount())
-//            .expirationPolicy(ExpirationPolicyType.valueOf(coupon.getExpirationPolicyType())
-//                .createExpirationPolicy(coupon.getStartAt(), coupon.getExpiredAt(), coupon.getDaysFromIssuance()))
+            .expirationPolicy(coupon.getExpirationPolicy())
             .minOrderPrice(coupon.getMinOrderPrice())
-//            .discountType(DiscountType.valueOf(coupon.getDiscountType()))
-//            .issuerType(IssuerType.valueOf(coupon.getIssuerType()))
+            .discountType(coupon.getDiscountType().name())
+            .issuerType(coupon.getIssuerType().name())
             .issuerId(coupon.getIssuerId())
             .maxCount(coupon.getMaxCount())
             .allocatedCount(coupon.getAllocatedCount())
             .maxCountPerCustomer(coupon.getMaxCountPerCustomer())
-//            .promotionCode(coupon.getPromotionCod())
+            .promotionCode(coupon.getPromotionCode())
             .build();
     }
 

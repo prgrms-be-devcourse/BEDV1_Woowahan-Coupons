@@ -6,6 +6,7 @@ import com.coumin.woowahancoupons.domain.coupon.DiscountType;
 import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
 import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
 import com.coumin.woowahancoupons.domain.coupon.IssuerType;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ class CouponRepositoryTest {
 	@DisplayName("BaseEntity 생성 테스트")
 	void baseEntityAuditingTest() {
 		//Given
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now().minusMinutes(1);
 		Coupon coupon = createCoupons(IssuerType.ADMIN, 1L, 1).get(0);
 		entityManager.persist(coupon);
 		entityManager.clear();
