@@ -1,12 +1,5 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.coupon;
 
-import com.coumin.woowahancoupons.domain.coupon.Coupon;
-import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
-import com.coumin.woowahancoupons.domain.coupon.DiscountType;
-import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
-import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
-import com.coumin.woowahancoupons.domain.coupon.IssuerType;
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +12,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-@DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DataJpaTest
 class CouponRepositoryTest {
 
 	@Autowired

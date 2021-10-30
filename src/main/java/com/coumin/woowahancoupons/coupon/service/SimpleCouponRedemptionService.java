@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
     private final CouponRedemptionRepository couponRedemptionRepository;
+
     private final CustomerRepository customerRepository;
 
     public SimpleCouponRedemptionService(
@@ -25,10 +26,11 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
     @Transactional
     @Override
-    public void allocateCouponToCustomer(UUID couponId, Long customerId) {
-        CouponRedemption couponRedemption = couponRedemptionRepository.findById(couponId)
-            .orElseThrow(() -> new CouponRedemptionNotFoundException(couponId));
+    public void allocateCouponToCustomer(UUID issuanceCode, Long customerId) {
+        CouponRedemption couponRedemption = couponRedemptionRepository.findByIssuanceCode(issuanceCode)
+            .orElseThrow(() -> new CouponRedemptionNotFoundException(issuanceCode));
         Customer customer = customerRepository.getById(customerId);
-        couponRedemption.changeCustomer(customer);
+
+        couponRedemption.allocateCustomer(customer);
     }
 }

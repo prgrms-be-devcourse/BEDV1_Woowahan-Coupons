@@ -1,15 +1,14 @@
 package com.coumin.woowahancoupons.domain.coupon;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 
 @Getter
@@ -40,13 +39,15 @@ public class ExpirationPolicy {
     }
 
     public static ExpirationPolicy newByAfterIssueDate(Integer daysFromIssuance) {
-        Assert.notNull(daysFromIssuance, "daysFromIssuance must not be null");
+        Objects.requireNonNull(daysFromIssuance, "daysFromIssuance must not be null");
+
         return new ExpirationPolicy(ExpirationPolicyType.AFTER_ISSUE_DATE, null, null, daysFromIssuance);
     }
 
     public static ExpirationPolicy newByPeriod(LocalDateTime startAt, LocalDateTime expiredAt) {
-        Assert.notNull(startAt, "startAt must not be null");
-        Assert.notNull(expiredAt, "expiredAt must not be null");
+        Objects.requireNonNull(startAt, "startAt must not be null");
+        Objects.requireNonNull(expiredAt, "expiredAt must not be null");
+
         return new ExpirationPolicy(ExpirationPolicyType.PERIOD, startAt, expiredAt, null);
     }
 }

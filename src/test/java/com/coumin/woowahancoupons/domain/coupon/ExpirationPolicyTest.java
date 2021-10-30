@@ -1,9 +1,7 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.coupon;
 
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
-import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
-import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
 import java.time.LocalDateTime;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
@@ -40,11 +38,11 @@ class ExpirationPolicyTest {
         LocalDateTime expiredAt = LocalDateTime.now().plusDays(7);
 
         //When, Then
-        assertThatIllegalArgumentException().isThrownBy(() -> {
+        assertThatNullPointerException().isThrownBy(() -> {
             ExpirationPolicy.newByPeriod(null, expiredAt);
         }).withMessage("startAt must not be null");
 
-        assertThatIllegalArgumentException().isThrownBy(() -> {
+        assertThatNullPointerException().isThrownBy(() -> {
             ExpirationPolicy.newByPeriod(startAt, null);
         }).withMessage("expiredAt must not be null");
     }
@@ -70,7 +68,7 @@ class ExpirationPolicyTest {
     @Test
     @DisplayName("조건에 맞지 않는 경우, 실제 쿠폰 발급일시를 기준으로 지정된 기간을 쿠폰의 유효기간으로 하는 만료 정책 객체 생성 실패")
     void byAfterIssueDateTypeBuilderFailTest() {
-        assertThatIllegalArgumentException().isThrownBy(() -> {
+        assertThatNullPointerException().isThrownBy(() -> {
             ExpirationPolicy.newByAfterIssueDate(null);
         }).withMessage("daysFromIssuance must not be null");
     }
