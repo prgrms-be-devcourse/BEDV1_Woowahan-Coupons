@@ -8,12 +8,16 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
+import com.coumin.woowahancoupons.domain.coupon.DiscountType;
+import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,61 +31,62 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SimpleCouponServiceTest {
 
-	@Mock
-	private StoreRepository storeRepository;
+    @Mock
+    private StoreRepository storeRepository;
 
-	@Mock
-	private CouponRepository couponRepository;
+    @Mock
+    private CouponRepository couponRepository;
 
-	@InjectMocks
-	private SimpleCouponService couponService;
+    @InjectMocks
+    private SimpleCouponService couponService;
 
-	@Test
-	@DisplayName("매장의 쿠폰 생성 성공")
-	void saveAllStoreCouponsSuccessTest() {
-		//Given
-		long storeId = 1L;
-		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
-			.mapToObj(i -> StoreCouponSaveDto.builder()
-				.name("name#" + i)
-				.amount(1000L * (i + 1))
-				.daysAfterIssuance(30)
-				.minOrderPrice(1000L * (i + 1))
-				.build())
-			.collect(Collectors.toList());
-		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
+    @Test
+    @DisplayName("매장의 쿠폰 생성 성공")
+    void saveAllStoreCouponsSuccessTest() {
+        //Given
+        long storeId = 1L;
+        List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
+            .mapToObj(i -> StoreCouponSaveDto.builder()
+                .name("name#" + i)
+                .amount(1000L * (i + 1))
+                .daysAfterIssuance(30)
+                .minOrderPrice(1000L * (i + 1))
+                .build())
+            .collect(Collectors.toList());
+        StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
 
-		given(storeRepository.existsById(storeId)).willReturn(true);
+        given(storeRepository.existsById(storeId)).willReturn(true);
 
-		//When
-		couponService.saveAllStoreCoupons(storeId, requestDto);
+        //When
+        couponService.saveAllStoreCoupons(storeId, requestDto);
 
-		//Then
-		verify(storeRepository, times(1)).existsById(storeId);
-		verify(couponRepository, times(1)).saveAll(anyList());
-	}
+        //Then
+        verify(storeRepository, times(1)).existsById(storeId);
+        verify(couponRepository, times(1)).saveAll(anyList());
+    }
 
-	@Test
-	@DisplayName("매장 id가 유효하지 않으면, 매장의 쿠폰 생성 실패")
-	void saveAllStoreCouponsFailTest() {
-		//Given
-		long storeId = 1L;
-		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
-			.mapToObj(i -> StoreCouponSaveDto.builder()
-				.name("name#" + i)
-				.amount(1000L * (i + 1))
-				.daysAfterIssuance(30)
-				.minOrderPrice(1000L * (i + 1))
-				.build())
-			.collect(Collectors.toList());
-		StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
+    @Test
+    @DisplayName("매장 id가 유효하지 않으면, 매장의 쿠폰 생성 실패")
+    void saveAllStoreCouponsFailTest() {
+        //Given
+        long storeId = 1L;
+        List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
+            .mapToObj(i -> StoreCouponSaveDto.builder()
+                .name("name#" + i)
+                .amount(1000L * (i + 1))
+                .daysAfterIssuance(30)
+                .minOrderPrice(1000L * (i + 1))
+                .build())
+            .collect(Collectors.toList());
+        StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
 
-		given(storeRepository.existsById(any())).willReturn(false);
+        given(storeRepository.existsById(any())).willReturn(false);
 
-		//When, Then
-		assertThatThrownBy(() -> couponService.saveAllStoreCoupons(storeId, requestDto))
-			.isInstanceOf(StoreNotFoundException.class)
-			.hasMessageContaining(ErrorCode.STORE_NOT_FOUND.getMessage());
-		verify(storeRepository, only()).existsById(storeId);
-	}
+        //When, Then
+        assertThatThrownBy(() -> couponService.saveAllStoreCoupons(storeId, requestDto))
+            .isInstanceOf(StoreNotFoundException.class)
+            .hasMessageContaining(ErrorCode.STORE_NOT_FOUND.getMessage());
+        verify(storeRepository, only()).existsById(storeId);
+    }
+
 }

@@ -30,7 +30,7 @@ public class CouponCreateConverter {
             .maxCount(dto.getMaxCount())
             .allocatedCount(dto.getAllocatedCount())
             .maxCountPerCustomer(dto.getMaxCountPerCustomer())
-            .promotionCode(dto.getPromotionCod())
+            .promotionCode(dto.getPromotionCode())
             .build();
     }
 
