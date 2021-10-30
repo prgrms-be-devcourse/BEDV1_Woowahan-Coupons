@@ -27,8 +27,10 @@ class SimpleCouponWalletServiceTest {
 
     @Mock
     private CouponWalletRepository couponWalletRepository;
+    
     @Mock
     private CustomerRepository customerRepository;
+    
     @InjectMocks
     private SimpleCouponWalletService couponWalletService;
 
