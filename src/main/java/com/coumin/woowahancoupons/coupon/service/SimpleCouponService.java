@@ -1,5 +1,8 @@
 package com.coumin.woowahancoupons.coupon.service;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
@@ -17,13 +20,16 @@ public class SimpleCouponService implements CouponService {
 
     private final CouponRepository couponRepository;
     private final StoreRepository storeRepository;
+    private final CouponCreateConverter couponCreateConverter;
 
     public SimpleCouponService(
         CouponRepository couponRepository,
-        StoreRepository storeRepository
+        StoreRepository storeRepository,
+        CouponCreateConverter couponCreateConverter
     ) {
         this.couponRepository = couponRepository;
         this.storeRepository = storeRepository;
+        this.couponCreateConverter = couponCreateConverter;
     }
 
     @Transactional
@@ -37,5 +43,13 @@ public class SimpleCouponService implements CouponService {
             .map(storeCouponSaveDto -> storeCouponSaveDto.toEntity(storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);
+    }
+
+    @Transactional
+    @Override
+    public CouponCreateResponseDto generateCoupon(CouponCreateRequestDto couponCreateRequest) {
+        Coupon coupon = couponCreateConverter.convertToCoupon(couponCreateRequest);
+        Coupon saveToCoupon = couponRepository.save(coupon);
+        return couponCreateConverter.convertToCouponCreateResponse(saveToCoupon);
     }
 }

@@ -9,7 +9,7 @@ public enum ErrorCode {
 
     ENTITY_NOT_FOUND(400, "C001", " Entity Not Found"),
     COUPON_REDEMPTION_NOT_FOUND(400, "C002", "Can not find a CouponRedemption for id "),
-    STORE_NOT_FOUND(400, "C003", "Can not find a Store for id ");
+    STORE_NOT_FOUND(400, "C003", "Can not find a Store for id "),
 
     INVALID_INPUT_VALUE(400, "C004", " Invalid Input Value"),
     METHOD_NOT_ALLOWED(405, "C005", " Method not allowed");

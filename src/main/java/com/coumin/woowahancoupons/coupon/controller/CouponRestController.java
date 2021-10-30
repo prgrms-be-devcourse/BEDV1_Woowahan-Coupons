@@ -1,5 +1,7 @@
 package com.coumin.woowahancoupons.coupon.controller;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.coupon.service.CouponService;
 import com.coumin.woowahancoupons.global.ApiResponse;
@@ -14,18 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/coupons")
 public class CouponRestController {
 
-	private final CouponService couponService;
+    private final CouponService couponService;
 
-	public CouponRestController(CouponService couponService) {
-		this.couponService = couponService;
-	}
+    public CouponRestController(CouponService couponService) {
+        this.couponService = couponService;
+    }
 
-	@PostMapping("/{storeId}/issuance")
-	public ApiResponse<Object> createStoreCoupons(
-		@PathVariable long storeId,
-		@RequestBody @Valid StoreCouponSaveRequestDto storeCouponSaveRequestDto) {
+    @PostMapping("/{storeId}/issuance")
+    public ApiResponse<Object> createStoreCoupons(
+        @PathVariable long storeId,
+        @RequestBody @Valid StoreCouponSaveRequestDto storeCouponSaveRequestDto) {
 
-		couponService.saveAllStoreCoupons(storeId, storeCouponSaveRequestDto);
-		return ApiResponse.success();
-	}
+        couponService.saveAllStoreCoupons(storeId, storeCouponSaveRequestDto);
+        return ApiResponse.success();
+    }
+
+    @PostMapping
+    public ApiResponse<CouponCreateResponseDto> save(
+        @RequestBody CouponCreateRequestDto couponCreateDto
+    ) {
+        CouponCreateResponseDto couponCreateResponse = couponService.generateCoupon(couponCreateDto);
+        return ApiResponse.success(couponCreateResponse);
+    }
 }
