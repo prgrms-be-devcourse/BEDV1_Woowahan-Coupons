@@ -7,12 +7,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
-import com.coumin.woowahancoupons.domain.coupon.CouponWallet;
-import com.coumin.woowahancoupons.domain.coupon.CouponWalletRepository;
+import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
+import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
-import com.coumin.woowahancoupons.global.exception.CouponWalletNotFoundException;
+import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -23,43 +23,43 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class SimpleCouponWalletServiceTest {
+class SimpleCouponRedemptionServiceTest {
 
     @Mock
-    private CouponWalletRepository couponWalletRepository;
+    private CouponRedemptionRepository couponRedemptionRepository;
     
     @Mock
     private CustomerRepository customerRepository;
     
     @InjectMocks
-    private SimpleCouponWalletService couponWalletService;
+    private SimpleCouponRedemptionService couponRedemptionService;
 
     @Test
     @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 성공 테스트")
     void allocateCouponToCustomerSuccessTest() {
         //Given
         Long customerId = 1L;
-        CouponWallet couponWallet = new CouponWallet(mock(Coupon.class));
+        CouponRedemption couponRedemption = new CouponRedemption(mock(Coupon.class));
         Customer mockCustomer = mock(Customer.class);
-        given(couponWalletRepository.findById(any())).willReturn(Optional.of(couponWallet));
+        given(couponRedemptionRepository.findById(any())).willReturn(Optional.of(couponRedemption));
         given(customerRepository.getById(customerId)).willReturn(mockCustomer);
         given(mockCustomer.getId()).willReturn(customerId);
         //When
-        assertThat(couponWallet.getCustomer()).isNull();
-        couponWalletService.allocateCouponToCustomer(UUID.randomUUID(), customerId);
+        assertThat(couponRedemption.getCustomer()).isNull();
+        couponRedemptionService.allocateCouponToCustomer(UUID.randomUUID(), customerId);
         //Then
-        assertThat(couponWallet.getCustomer()).isNotNull();
-        assertThat(couponWallet.getCustomer().getId()).isEqualTo(customerId);
+        assertThat(couponRedemption.getCustomer()).isNotNull();
+        assertThat(couponRedemption.getCustomer().getId()).isEqualTo(customerId);
     }
 
     @Test
     @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 실패 테스트 (잘못된 쿠폰 Id)")
     void allocateCouponToCustomerFailureTest() {
         //Given
-        given(couponWalletRepository.findById(any())).willReturn(Optional.empty());
+        given(couponRedemptionRepository.findById(any())).willReturn(Optional.empty());
         //When Then
-        assertThatThrownBy(() -> couponWalletService.allocateCouponToCustomer(UUID.randomUUID(), 1L))
-            .isInstanceOf(CouponWalletNotFoundException.class)
-            .hasMessageContaining(ErrorCode.COUPON_WALLET_NOT_FOUND.getMessage());
+        assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomer(UUID.randomUUID(), 1L))
+            .isInstanceOf(CouponRedemptionNotFoundException.class)
+            .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
     }
 }
