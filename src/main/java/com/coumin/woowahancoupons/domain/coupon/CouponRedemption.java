@@ -15,49 +15,49 @@ import java.util.UUID;
 @Entity
 public class CouponRedemption extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "coupon_redemption_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "coupon_redemption_id")
+    private Long id;
 
-	@Column(name = "issuance_code", nullable = false, unique = true)
-	private UUID issuanceCode;
+    @Column(name = "issuance_code", nullable = false, unique = true)
+    private UUID issuanceCode;
 
-	@Column(name = "use_yn", nullable = false)
-	private boolean used;
+    @Column(name = "use_yn", nullable = false)
+    private boolean used;
 
-	@Column(columnDefinition = "TIMESTAMP")
-	private LocalDateTime usedAt;
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime usedAt;
 
-	@Embedded
-	private ExpirationPeriod expirationPeriod;
+    @Embedded
+    private ExpirationPeriod expirationPeriod;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "coupon_id", nullable = false)
-	private Coupon coupon;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id", nullable = false)
+    private Coupon coupon;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_id")
-	private Order order;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-	public CouponRedemption(Coupon coupon) {
-		this.expirationPeriod = ExpirationPeriod.from(coupon.getExpirationPolicy());
-		this.coupon = coupon;
-		this.issuanceCode = UUID.randomUUID();
-	}
+    public CouponRedemption(Coupon coupon) {
+        this.expirationPeriod = ExpirationPeriod.from(coupon.getExpirationPolicy());
+        this.coupon = coupon;
+        this.issuanceCode = UUID.randomUUID();
+    }
 
-	public void allocateCustomer(Customer customer) {
-		verifyCustomer();
-		this.customer = customer;
-	}
+    public void allocateCustomer(Customer customer) {
+        verifyCustomer();
+        this.customer = customer;
+    }
 
-	public void verifyCustomer() {
-		if (customer != null) {
-			throw new CouponRedemptionAlreadyAllocateCustomer();
-		}
-	}
+    public void verifyCustomer() {
+        if (customer != null) {
+            throw new CouponRedemptionAlreadyAllocateCustomer();
+        }
+    }
 }
