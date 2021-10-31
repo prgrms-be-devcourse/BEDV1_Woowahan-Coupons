@@ -1,6 +1,6 @@
 package com.coumin.woowahancoupons.coupon.service;
 
-import com.coumin.woowahancoupons.coupon.dto.CouponCreateConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
@@ -20,16 +20,16 @@ public class SimpleCouponService implements CouponService {
 
     private final CouponRepository couponRepository;
     private final StoreRepository storeRepository;
-    private final CouponCreateConverter couponCreateConverter;
+    private final CouponConverter couponConverter;
 
     public SimpleCouponService(
         CouponRepository couponRepository,
         StoreRepository storeRepository,
-        CouponCreateConverter couponCreateConverter
+        CouponConverter couponConverter
     ) {
         this.couponRepository = couponRepository;
         this.storeRepository = storeRepository;
-        this.couponCreateConverter = couponCreateConverter;
+        this.couponConverter = couponConverter;
     }
 
     @Transactional
@@ -39,7 +39,7 @@ public class SimpleCouponService implements CouponService {
             throw new StoreNotFoundException(storeId);
         }
 
-        List<Coupon> coupons = requestDto.getStoreCouponSaveDtos().stream()
+        List<Coupon> coupons = requestDto.getStoreCouponSaves().stream()
             .map(storeCouponSaveDto -> storeCouponSaveDto.toEntity(storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);
@@ -48,8 +48,8 @@ public class SimpleCouponService implements CouponService {
     @Transactional
     @Override
     public CouponCreateResponseDto generateCoupon(CouponCreateRequestDto couponCreateRequest) {
-        Coupon coupon = couponCreateConverter.convertToCoupon(couponCreateRequest);
+        Coupon coupon = couponConverter.convertToCoupon(couponCreateRequest);
         Coupon saveToCoupon = couponRepository.save(coupon);
-        return couponCreateConverter.convertToCouponCreateResponse(saveToCoupon);
+        return couponConverter.convertToCouponCreateResponse(saveToCoupon);
     }
 }

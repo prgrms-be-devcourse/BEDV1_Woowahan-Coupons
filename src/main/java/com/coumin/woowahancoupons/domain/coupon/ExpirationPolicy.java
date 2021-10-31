@@ -31,7 +31,8 @@ public class ExpirationPolicy {
 
     private ExpirationPolicy(
         ExpirationPolicyType expirationPolicyType, LocalDateTime startAt,
-        LocalDateTime expiredAt, Integer daysFromIssuance) {
+        LocalDateTime expiredAt, Integer daysFromIssuance
+    ) {
         this.expirationPolicyType = expirationPolicyType;
         this.startAt = startAt;
         this.expiredAt = expiredAt;
@@ -40,22 +41,27 @@ public class ExpirationPolicy {
 
     public static ExpirationPolicy newByAfterIssueDate(Integer daysFromIssuance) {
         Assert.notNull(daysFromIssuance, "daysFromIssuance must not be null");
-        return new ExpirationPolicy(ExpirationPolicyType.AFTER_ISSUE_DATE, null, null, daysFromIssuance);
+
+        return new ExpirationPolicy(ExpirationPolicyType.AFTER_ISSUE_DATE, null, null,
+            daysFromIssuance);
     }
 
     public static ExpirationPolicy newByPeriod(LocalDateTime startAt, LocalDateTime expiredAt) {
         Assert.notNull(startAt, "startAt must not be null");
         Assert.notNull(expiredAt, "expiredAt must not be null");
+
         return new ExpirationPolicy(ExpirationPolicyType.PERIOD, startAt, expiredAt, null);
     }
 
     public ExpirationPeriod newExpirationPeriod() {
-        LocalDateTime startAt = this.startAt;
-        LocalDateTime expiredAt = this.expiredAt;
+
         if (this.expirationPolicyType == ExpirationPolicyType.AFTER_ISSUE_DATE) {
-            startAt = LocalDateTime.now();
-            expiredAt = LocalDateTime.now().plusDays(this.daysFromIssuance);
+            return new ExpirationPeriod(
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(this.daysFromIssuance)
+            );
         }
-        return new ExpirationPeriod(startAt, expiredAt);
+
+        return new ExpirationPeriod(this.startAt, this.expiredAt);
     }
 }

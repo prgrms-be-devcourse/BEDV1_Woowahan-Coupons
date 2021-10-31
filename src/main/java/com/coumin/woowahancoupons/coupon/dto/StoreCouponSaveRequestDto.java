@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreCouponSaveRequestDto {
 
-	@Valid
-	@Size(min = 1, max = 3)
-	private List<StoreCouponSaveDto> storeCouponSaveDtos;
+    @Valid
+    @Size(min = 1, max = 3)
+    private List<StoreCouponSaveDto> storeCouponSaves;
 
-	public StoreCouponSaveRequestDto(List<StoreCouponSaveDto> storeCouponSaveDtos) {
-		this.storeCouponSaveDtos = storeCouponSaveDtos;
-	}
+    public StoreCouponSaveRequestDto(List<StoreCouponSaveDto> storeCouponSaves) {
+        this.storeCouponSaves = storeCouponSaves;
+    }
 }
