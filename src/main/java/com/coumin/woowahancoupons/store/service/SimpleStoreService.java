@@ -11,17 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SimpleStoreService implements StoreService {
 
-	private final CouponRepository couponRepository;
+    private final CouponRepository couponRepository;
 
-	public SimpleStoreService(
-		CouponRepository couponRepository) {
-		this.couponRepository = couponRepository;
-	}
+    public SimpleStoreService(CouponRepository couponRepository) {
+        this.couponRepository = couponRepository;
+    }
 
-	@Override
-	public List<StoreCouponResponseDto> findStoreCoupons(Long storeId) {
-		return couponRepository.findByIssuerId(storeId).stream()
-			.map(StoreCouponResponseDto::new)
-			.collect(Collectors.toList());
-	}
+    @Override
+    public List<StoreCouponResponseDto> findStoreCoupons(Long storeId) {
+        return couponRepository.findByIssuerId(storeId).stream()
+            .map(StoreCouponResponseDto::new)
+            .collect(Collectors.toList());
+    }
 }
