@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="stores")
+@Table(name = "stores")
 @Entity
 public class Store extends BaseEntity {
 

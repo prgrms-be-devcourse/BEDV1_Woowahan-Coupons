@@ -14,15 +14,15 @@ public class CouponRedemptionRestController {
 
     private final CouponRedemptionService couponRedemptionService;
 
-    public CouponRedemptionRestController(
-        CouponRedemptionService couponRedemptionService) {
+    public CouponRedemptionRestController(CouponRedemptionService couponRedemptionService) {
         this.couponRedemptionService = couponRedemptionService;
     }
 
     @PatchMapping("/{couponCode}/customers/{customerId}/register")
     public ApiResponse<Object> registerCouponCode(
         @PathVariable("couponCode") UUID couponCode,
-        @PathVariable("customerId") Long customerId) {
+        @PathVariable("customerId") Long customerId
+    ) {
         couponRedemptionService.allocateExistingCouponToCustomer(couponCode, customerId);
         return ApiResponse.success();
     }

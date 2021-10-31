@@ -56,10 +56,11 @@ public class Coupon extends BaseEntity {
     private final List<CouponRedemption> couponRedemptions = new ArrayList<>();
 
     @Builder(builderMethodName = "internalBuilder")
-    private Coupon(Long id, String name, Long amount,
-        ExpirationPolicy expirationPolicy, Long minOrderPrice,
+    private Coupon(
+        Long id, String name, Long amount, ExpirationPolicy expirationPolicy, Long minOrderPrice,
         DiscountType discountType, IssuerType issuerType, Long issuerId, Integer maxCount,
-        Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode) {
+        Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode
+    ) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -97,5 +98,4 @@ public class Coupon extends BaseEntity {
             .issuerType(issuerType)
             .issuerId(issuerId);
     }
-
 }

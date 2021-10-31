@@ -41,7 +41,7 @@ class CouponRestControllerTest {
 	@Test
 	@DisplayName("매장의 쿠폰 생성 성공")
 	void createStoreCouponsSuccessTest() throws Exception {
-		// given
+		//Given
 		long storeId = storeRepository.save(new Store("testStore#1")).getId();
 		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 3)
 			.mapToObj(i -> StoreCouponSaveDto.builder()
@@ -66,7 +66,7 @@ class CouponRestControllerTest {
 	@Test
 	@DisplayName("요청이 유효하지 않으면 매장의 쿠폰 생성 실패")
 	void createStoreCouponsInvalidRequestValueTest() throws Exception {
-		// given
+		//Given
 		long storeId = storeRepository.save(new Store("testStore#1")).getId();
 		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
 			.mapToObj(i -> StoreCouponSaveDto.builder()
@@ -91,7 +91,7 @@ class CouponRestControllerTest {
 	@Test
 	@DisplayName("요청이 유효하지 않은 메서드라면 매장의 쿠폰 생성 실패")
 	void createStoreCouponsInvalidRequestMethodTest() throws Exception {
-		// given
+		//Given
 		long storeId = storeRepository.save(new Store("testStore#1")).getId();
 		List<StoreCouponSaveDto> storeCouponSaveDtos = IntStream.range(0, 5)
 			.mapToObj(i -> StoreCouponSaveDto.builder()

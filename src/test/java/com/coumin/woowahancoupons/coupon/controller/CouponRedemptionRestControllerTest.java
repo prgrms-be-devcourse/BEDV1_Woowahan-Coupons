@@ -56,6 +56,7 @@ class CouponRedemptionRestControllerTest {
         //given
         CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
         entityManager.persist(couponRedemption);
+
         //when
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
@@ -63,6 +64,7 @@ class CouponRedemptionRestControllerTest {
                 testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
+
         //then
         result.andDo(print())
             .andExpect(status().isOk())
@@ -77,6 +79,7 @@ class CouponRedemptionRestControllerTest {
     void registerCouponCodeFailureTest() throws Exception {
         //given
         UUID wrongCouponCode = UUID.randomUUID();
+
         //when
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
@@ -84,6 +87,7 @@ class CouponRedemptionRestControllerTest {
                 testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
+
         //then
         result.andDo(print())
             .andExpect(status().is4xxClientError())

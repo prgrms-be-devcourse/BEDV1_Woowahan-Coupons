@@ -33,10 +33,11 @@ public class CouponCreateResponseDto {
     private String promotionCode;
 
     @Builder
-    public CouponCreateResponseDto(String name, Long amount,
-                                   ExpirationPolicy expirationPolicy, Long minOrderPrice, String discountType,
-                                   String issuerType, Long issuerId, Integer maxCount, Integer allocatedCount,
-                                   Integer maxCountPerCustomer, String promotionCode) {
+    public CouponCreateResponseDto(
+        String name, Long amount, ExpirationPolicy expirationPolicy, Long minOrderPrice,
+        String discountType, String issuerType, Long issuerId, Integer maxCount,
+        Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode
+    ) {
         this.name = name;
         this.amount = amount;
         this.expirationPolicy = expirationPolicy;
