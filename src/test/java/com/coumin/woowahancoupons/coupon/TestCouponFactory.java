@@ -17,14 +17,4 @@ public class TestCouponFactory {
                 IssuerType.ADMIN,
                 1L);
     }
-
-    public static Coupon.CouponBuilder builder(Long issuerId) {
-        return Coupon.builder(
-            "test coupon",
-            1000L,
-            ExpirationPolicy.newByPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(30)),
-            DiscountType.FIXED_AMOUNT,
-            IssuerType.ADMIN,
-            issuerId);
-    }
 }

@@ -51,6 +51,7 @@ public class CouponRedemption extends BaseEntity {
         this.coupon = coupon;
         this.customer = customer;
         this.expirationPeriod = coupon.getExpirationPolicy().newExpirationPeriod();
+        this.couponCode = UUID.randomUUID();
     }
 
     public static CouponRedemption of(Coupon coupon) {

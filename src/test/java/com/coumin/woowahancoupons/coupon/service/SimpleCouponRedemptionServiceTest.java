@@ -2,10 +2,10 @@ package com.coumin.woowahancoupons.coupon.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import com.coumin.woowahancoupons.coupon.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
@@ -27,10 +27,10 @@ class SimpleCouponRedemptionServiceTest {
 
     @Mock
     private CouponRedemptionRepository couponRedemptionRepository;
-    
+
     @Mock
     private CustomerRepository customerRepository;
-    
+
     @InjectMocks
     private SimpleCouponRedemptionService couponRedemptionService;
 
@@ -39,14 +39,20 @@ class SimpleCouponRedemptionServiceTest {
     void allocateCouponToCustomerSuccessTest() {
         //Given
         Long customerId = 1L;
-        CouponRedemption couponRedemption = CouponRedemption.of(mock(Coupon.class));
         Customer mockCustomer = mock(Customer.class);
-        given(couponRedemptionRepository.findByCouponCode(any())).willReturn(Optional.of(couponRedemption));
+        Coupon coupon = TestCouponFactory.builder().build();
+        CouponRedemption couponRedemption = CouponRedemption.of(coupon);
+
+        given(couponRedemptionRepository.findByCouponCode(couponRedemption.getCouponCode()))
+            .willReturn(Optional.of(couponRedemption));
         given(customerRepository.getById(customerId)).willReturn(mockCustomer);
         given(mockCustomer.getId()).willReturn(customerId);
+
         //When
         assertThat(couponRedemption.getCustomer()).isNull();
-        couponRedemptionService.allocateExistingCouponToCustomer(UUID.randomUUID(), customerId);
+        couponRedemptionService
+            .allocateExistingCouponToCustomer(couponRedemption.getCouponCode(), customerId);
+
         //Then
         assertThat(couponRedemption.getCustomer()).isNotNull();
         assertThat(couponRedemption.getCustomer().getId()).isEqualTo(customerId);
@@ -58,8 +64,10 @@ class SimpleCouponRedemptionServiceTest {
         //Given
         UUID invalidId = UUID.randomUUID();
         given(couponRedemptionRepository.findById(invalidId)).willReturn(Optional.empty());
+
         //When Then
-        assertThatThrownBy(() -> couponRedemptionService.allocateExistingCouponToCustomer(invalidId, 1L))
+        assertThatThrownBy(
+            () -> couponRedemptionService.allocateExistingCouponToCustomer(invalidId, 1L))
             .isInstanceOf(CouponRedemptionNotFoundException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
     }
