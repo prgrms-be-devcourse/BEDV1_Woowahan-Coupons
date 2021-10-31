@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.coumin.woowahancoupons.coupon.TestCouponFactory;
+import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.customer.Customer;
@@ -36,7 +37,10 @@ class CouponRedemptionRestControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    EntityManager entityManager;
+    private EntityManager entityManager;
+
+    @Autowired
+    private CouponRedemptionService couponRedemptionService;
 
     private Customer testCustomer;
 
@@ -93,5 +97,30 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getCode())))
             .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage())));
+    }
+
+    @Test
+    @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 등록 - 실패 테스트 (이미 등록된 쿠폰)")
+    void registerCouponCodeFailureTest2() throws Exception {
+        //given
+        CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
+        entityManager.persist(couponRedemption);
+        couponRedemptionService.allocateExistingCouponToCustomer(couponRedemption.getCouponCode(), testCustomer.getId());
+        //when
+        ResultActions result = mockMvc.perform(
+            patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
+                couponRedemption.getCouponCode(),
+                testCustomer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("registerCouponCode"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
     }
 }
