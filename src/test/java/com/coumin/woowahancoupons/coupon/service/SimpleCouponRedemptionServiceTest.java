@@ -27,10 +27,10 @@ class SimpleCouponRedemptionServiceTest {
 
     @Mock
     private CouponRedemptionRepository couponRedemptionRepository;
-    
+
     @Mock
     private CustomerRepository customerRepository;
-    
+
     @InjectMocks
     private SimpleCouponRedemptionService couponRedemptionService;
 
@@ -43,13 +43,17 @@ class SimpleCouponRedemptionServiceTest {
         Coupon coupon = TestCouponFactory.builder().build();
         CouponRedemption couponRedemption = CouponRedemption.of(coupon);
 
-        given(couponRedemptionRepository.findById(couponRedemption.getId())).willReturn(Optional.of(couponRedemption));
+        given(couponRedemptionRepository.findByCouponCode(couponRedemption.getCouponCode()))
+            .willReturn(Optional.of(couponRedemption));
         given(customerRepository.getById(customerId)).willReturn(mockCustomer);
         given(mockCustomer.getId()).willReturn(customerId);
 
         //When
         assertThat(couponRedemption.getCustomer()).isNull();
-        couponRedemptionService.allocateExistingCouponToCustomer(couponRedemption.getId(), customerId);
+        couponRedemptionService.allocateExistingCouponToCustomer(
+            couponRedemption.getCouponCode(),
+            customerId
+        );
 
         //Then
         assertThat(couponRedemption.getCustomer()).isNotNull();
@@ -61,10 +65,11 @@ class SimpleCouponRedemptionServiceTest {
     void allocateCouponToCustomerFailureTest() {
         //Given
         UUID invalidId = UUID.randomUUID();
-        given(couponRedemptionRepository.findById(invalidId)).willReturn(Optional.empty());
+        given(couponRedemptionRepository.findByCouponCode(invalidId)).willReturn(Optional.empty());
 
         //When Then
-        assertThatThrownBy(() -> couponRedemptionService.allocateExistingCouponToCustomer(invalidId, 1L))
+        assertThatThrownBy(
+            () -> couponRedemptionService.allocateExistingCouponToCustomer(invalidId, 1L))
             .isInstanceOf(CouponRedemptionNotFoundException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
     }

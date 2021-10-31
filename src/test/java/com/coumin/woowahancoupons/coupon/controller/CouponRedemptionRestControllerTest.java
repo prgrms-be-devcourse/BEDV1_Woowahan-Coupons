@@ -59,7 +59,7 @@ class CouponRedemptionRestControllerTest {
         //when
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
-                couponRedemption.getId(),
+                couponRedemption.getCouponCode(),
                 testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
