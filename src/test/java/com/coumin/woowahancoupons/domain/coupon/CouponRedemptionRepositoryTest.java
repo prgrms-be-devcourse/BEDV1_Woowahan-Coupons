@@ -42,7 +42,7 @@ class CouponRedemptionRepositoryTest {
     }
 
     @Test
-    @DisplayName("발급 코드로 CouponRedemption 조회 성공")
+    @DisplayName("쿠폰 코드로 조회 성공")
     void findCouponRedemptionByIssuanceCodeTest() {
         //Given
         Coupon coupon = TestCouponFactory.builder().build();
