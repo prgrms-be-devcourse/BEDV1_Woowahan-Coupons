@@ -55,7 +55,7 @@ public class CouponRedemption {
         return new CouponRedemption(coupon, null);
     }
 
-    public static CouponRedemption from(Coupon coupon, Customer customer) {
+    public static CouponRedemption of(Coupon coupon, Customer customer) {
         Assert.notNull(customer, "customer must be not null");
         return new CouponRedemption(coupon, customer);
     }
