@@ -6,7 +6,6 @@ import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
@@ -48,5 +47,15 @@ public class ExpirationPolicy {
         Assert.notNull(startAt, "startAt must not be null");
         Assert.notNull(expiredAt, "expiredAt must not be null");
         return new ExpirationPolicy(ExpirationPolicyType.PERIOD, startAt, expiredAt, null);
+    }
+
+    public ExpirationPeriod newExpirationPeriod() {
+        LocalDateTime startAt = this.startAt;
+        LocalDateTime expiredAt = this.expiredAt;
+        if (this.expirationPolicyType == ExpirationPolicyType.AFTER_ISSUE_DATE) {
+            startAt = LocalDateTime.now();
+            expiredAt = LocalDateTime.now().plusDays(this.daysFromIssuance);
+        }
+        return new ExpirationPeriod(startAt, expiredAt);
     }
 }
