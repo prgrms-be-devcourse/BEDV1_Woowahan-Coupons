@@ -16,43 +16,43 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreCouponSaveRequestDto {
 
-	@Size(min = 2, max = 100)
-	@NotEmpty
-	private String name;
+    @Size(min = 2, max = 100)
+    @NotEmpty
+    private String name;
 
-	@Max(10000)
-	@Min(1000)
-	private long amount;
+    @Max(10000)
+    @Min(1000)
+    private long amount;
 
-	@Max(30)
-	@Min(7)
-	private int daysAfterIssuance;
+    @Max(30)
+    @Min(7)
+    private int daysAfterIssuance;
 
-	@Max(100000)
-	@PositiveOrZero
-	private Long minOrderPrice;
+    @Max(100000)
+    @PositiveOrZero
+    private Long minOrderPrice;
 
-	@Builder
-	public StoreCouponSaveRequestDto(String name, long amount, int daysAfterIssuance,
-		Long minOrderPrice) {
-		this.name = name;
-		this.amount = amount;
-		this.daysAfterIssuance = daysAfterIssuance;
-		this.minOrderPrice = minOrderPrice;
-	}
+    @Builder
+    public StoreCouponSaveRequestDto(String name, long amount, int daysAfterIssuance,
+        Long minOrderPrice) {
+        this.name = name;
+        this.amount = amount;
+        this.daysAfterIssuance = daysAfterIssuance;
+        this.minOrderPrice = minOrderPrice;
+    }
 
-	public Coupon toEntity(Long issuerId) {
-		ExpirationPolicy expirationPolicy = ExpirationPolicy.newByAfterIssueDate(daysAfterIssuance);
+    public Coupon toEntity(Long issuerId) {
+        ExpirationPolicy expirationPolicy = ExpirationPolicy.newByAfterIssueDate(daysAfterIssuance);
 
-		return Coupon.builder(
-			name,
-			amount,
-			expirationPolicy,
-			DiscountType.FIXED_AMOUNT,
-			IssuerType.STORE,
-			issuerId)
-			.minOrderPrice(minOrderPrice)
-			.maxCountPerCustomer(1)
-			.build();
-	}
+        return Coupon.builder(
+            name,
+            amount,
+            expirationPolicy,
+            DiscountType.FIXED_AMOUNT,
+            IssuerType.STORE,
+            issuerId)
+            .minOrderPrice(minOrderPrice)
+            .maxCountPerCustomer(1)
+            .build();
+    }
 }

@@ -48,7 +48,8 @@ public class SimpleCouponService implements CouponService {
     @Override
     public CouponCreateResponseDto generateCoupon(CouponCreateRequestDto couponCreateRequest) {
         Coupon coupon = couponCreateConverter.convertToCoupon(couponCreateRequest);
-        Coupon saveToCoupon = couponRepository.save(coupon);
-        return couponCreateConverter.convertToCouponCreateResponse(saveToCoupon);
+        Coupon savedCoupon = couponRepository.save(coupon);
+
+        return couponCreateConverter.convertToCouponCreateResponse(savedCoupon);
     }
 }

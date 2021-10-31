@@ -18,64 +18,66 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-	private ResponseEntity<ApiResponse<?>> newResponseEntity(Throwable throwable, HttpStatus status) {
-		Optional<String> message = Arrays.stream(throwable.getStackTrace())
-			.map(StackTraceElement::toString)
-			.reduce((a, b) -> a + " " + b);
+    private ResponseEntity<ApiResponse<?>> newResponseEntity(Throwable throwable, HttpStatus status) {
+        Optional<String> message = Arrays.stream(throwable.getStackTrace())
+            .map(StackTraceElement::toString)
+            .reduce((a, b) -> a + " " + b);
 
-		return newResponseEntity(ErrorCode.UNEXPECTED.getCode(),
-			message.orElse(throwable.getMessage()), status);
-	}
+        return newResponseEntity(ErrorCode.UNEXPECTED.getCode(),
+            message.orElse(throwable.getMessage()), status);
+    }
 
-	private ResponseEntity<ApiResponse<?>> newResponseEntity(String code, String message, HttpStatus status) {
-		return ResponseEntity.status(status).body(ApiResponse.error(code, message));
-	}
+    private ResponseEntity<ApiResponse<?>> newResponseEntity(String code, String message, HttpStatus status) {
+        return ResponseEntity.status(status).body(ApiResponse.error(code, message));
+    }
 
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
 
-		String errorDetail = e.getBindingResult().getFieldErrors().stream()
-			.map(error -> String.format("%s %s", error.getField(), error.getDefaultMessage()))
-			.collect(Collectors.joining(","));
-		String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
-		log.error("MethodArgumentNotValid exception occurred: {}", errorMessage);
+        String errorDetail = e.getBindingResult().getFieldErrors().stream()
+            .map(error -> String.format("%s %s", error.getField(), error.getDefaultMessage()))
+            .collect(Collectors.joining(","));
+        String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
+        log.error("MethodArgumentNotValid exception occurred: {}", errorMessage);
 
-		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
-	}
+        return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<ApiResponse<?>>  handleConstraintViolationException(ConstraintViolationException e) {
-		ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<?>> handleConstraintViolationException(ConstraintViolationException e) {
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
 
-		String errorDetail = e.getConstraintViolations().stream()
-			.map(x -> String.format("%s %s", x.getPropertyPath().toString(), x.getMessage()))
-			.collect(Collectors.joining());
-		String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
-		log.error("ConstraintViolationException exception occurred: {}", errorMessage);
+        String errorDetail = e.getConstraintViolations().stream()
+            .map(x -> String.format("%s %s", x.getPropertyPath().toString(), x.getMessage()))
+            .collect(Collectors.joining());
+        String errorMessage = String.format("%s - %s", errorCode.getMessage(), errorDetail);
+        log.error("ConstraintViolationException exception occurred: {}", errorMessage);
 
-		return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
-	}
+        return newResponseEntity(errorCode.getCode(), errorMessage, HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-	public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-		log.error("handleHttpRequestMethodNotSupportedException", e);
-		ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        log.error("handleHttpRequestMethodNotSupportedException", e);
+        ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
 
-		return newResponseEntity(errorCode.getCode(), errorCode.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
-	}
+        return newResponseEntity(errorCode.getCode(), errorCode.getMessage(),
+            HttpStatus.METHOD_NOT_ALLOWED);
+    }
 
-	@ExceptionHandler(BusinessException.class)
-	public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException e) {
-		log.error("businessException exception occurred: {}", e.getMessage(), e);
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException e) {
+        log.error("businessException exception occurred: {}", e.getMessage(), e);
 
-		return newResponseEntity(e.getErrorCode().getCode(), e.getMessage(), HttpStatus.BAD_REQUEST);
-	}
+        return newResponseEntity(e.getErrorCode().getCode(), e.getMessage(),
+            HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler({Exception.class, RuntimeException.class})
-	public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
-		log.error("Unexpected exception occurred: {}", e.getMessage(), e);
+    @ExceptionHandler({Exception.class, RuntimeException.class})
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        log.error("Unexpected exception occurred: {}", e.getMessage(), e);
 
-		return newResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+        return newResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

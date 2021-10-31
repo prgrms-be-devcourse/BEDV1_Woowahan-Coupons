@@ -28,121 +28,121 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 class CouponRestControllerTest {
 
-	@Autowired
-	private MockMvc mvc;
+    @Autowired
+    private MockMvc mvc;
 
-	@Autowired
-	private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-	@Autowired
-	private StoreRepository storeRepository;
+    @Autowired
+    private StoreRepository storeRepository;
 
-	@Test
-	@DisplayName("매장의 쿠폰 생성 성공")
-	void createStoreCouponsSuccessTest() throws Exception {
+    @Test
+    @DisplayName("매장의 쿠폰 생성 성공")
+    void createStoreCouponsSuccessTest() throws Exception {
 		// given
-		long storeId = storeRepository.save(new Store("testStore#1")).getId();
-		List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 3)
-			.mapToObj(i -> StoreCouponSaveRequestDto.builder()
-				.name("name#" + i)
-				.amount(1000L * (i + 1))
-				.daysAfterIssuance(30)
-				.minOrderPrice(1000L * (i + 1))
-				.build())
-			.collect(Collectors.toList());
+        long storeId = storeRepository.save(new Store("testStore#1")).getId();
+        List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 3)
+            .mapToObj(i -> StoreCouponSaveRequestDto.builder()
+                .name("name#" + i)
+                .amount(1000L * (i + 1))
+                .daysAfterIssuance(30)
+                .minOrderPrice(1000L * (i + 1))
+                .build())
+            .collect(Collectors.toList());
 
 		//When
-		ResultActions resultActions = requestCreateStoreCoupons(storeId, requestDtoList);
+        ResultActions resultActions = requestCreateStoreCoupons(storeId, requestDtoList);
 
 		//TODO rest docs
 		//Then
-		resultActions
-			.andExpect(status().isOk())
-			.andDo(print());
-	}
+        resultActions
+            .andExpect(status().isOk())
+            .andDo(print());
+    }
 
-	@Test
-	@DisplayName("매장의 쿠폰 생성 실패 - 유효하지 않은 쿠폰 데이터 사이즈")
-	void createStoreCouponsInvalidRequestSizeTest() throws Exception {
-		// given
-		long storeId = storeRepository.save(new Store("testStore#1")).getId();
-		List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
-			.mapToObj(i -> StoreCouponSaveRequestDto.builder()
-				.name("name#" + i)
-				.amount(1000L * (i + 1))
-				.daysAfterIssuance(30)
-				.minOrderPrice(1000L * (i + 1))
-				.build())
-			.collect(Collectors.toList());
+    @Test
+    @DisplayName("매장의 쿠폰 생성 실패 - 유효하지 않은 쿠폰 데이터 사이즈")
+    void createStoreCouponsInvalidRequestSizeTest() throws Exception {
+// given
+        long storeId = storeRepository.save(new Store("testStore#1")).getId();
+        List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
+            .mapToObj(i -> StoreCouponSaveRequestDto.builder()
+                .name("name#" + i)
+                .amount(1000L * (i + 1))
+                .daysAfterIssuance(30)
+                .minOrderPrice(1000L * (i + 1))
+                .build())
+            .collect(Collectors.toList());
 
 		//When
-		ResultActions resultActions = requestCreateStoreCoupons(storeId, requestDtoList);
+        ResultActions resultActions = requestCreateStoreCoupons(storeId, requestDtoList);
 
 		//TODO rest docs
 		//Then
-		resultActions
-			.andExpect(status().isBadRequest())
-			.andDo(print());
-	}
+        resultActions
+            .andExpect(status().isBadRequest())
+            .andDo(print());
+    }
 
-	@Test
-	@DisplayName("매장의 쿠폰 생성 실패 - 유효하지 않은 쿠폰 데이터 값")
-	void createStoreCouponsInvalidRequestValueTest() throws Exception {
+    @Test
+    @DisplayName("매장의 쿠폰 생성 실패 - 유효하지 않은 쿠폰 데이터 값")
+    void createStoreCouponsInvalidRequestValueTest() throws Exception {
 		// given
-		long storeId = storeRepository.save(new Store("testStore#1")).getId();
-		List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 2)
-			.mapToObj(i -> StoreCouponSaveRequestDto.builder()
-				.name("name#" + i)
-				.amount(0L)
-				.daysAfterIssuance(0)
-				.minOrderPrice(0L)
-				.build())
-			.collect(Collectors.toList());
+        long storeId = storeRepository.save(new Store("testStore#1")).getId();
+        List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 2)
+            .mapToObj(i -> StoreCouponSaveRequestDto.builder()
+                .name("name#" + i)
+                .amount(0L)
+                .daysAfterIssuance(0)
+                .minOrderPrice(0L)
+                .build())
+            .collect(Collectors.toList());
 
 		//When
-		ResultActions resultActions = requestCreateStoreCoupons(storeId, requestDtoList);
+        ResultActions resultActions = requestCreateStoreCoupons(storeId, requestDtoList);
 
 		//TODO rest docs
 		//Then
-		resultActions
-			.andExpect(status().isBadRequest())
-			.andDo(print());
-	}
+        resultActions
+            .andExpect(status().isBadRequest())
+            .andDo(print());
+    }
 
-	@Test
-	@DisplayName("매장의 쿠폰 생성 실패 - 유효하지 않은 요청 메서드")
-	void createStoreCouponsInvalidRequestMethodTest() throws Exception {
+    @Test
+    @DisplayName("매장의 쿠폰 생성 실패 - 유효하지 않은 요청 메서드")
+    void createStoreCouponsInvalidRequestMethodTest() throws Exception {
 		// given
-		long storeId = storeRepository.save(new Store("testStore#1")).getId();
-		List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
-			.mapToObj(i -> StoreCouponSaveRequestDto.builder()
-				.name("name#" + i)
-				.amount(1000L * (i + 1))
-				.daysAfterIssuance(30)
-				.minOrderPrice(1000L * (i + 1))
-				.build())
-			.collect(Collectors.toList());
+        long storeId = storeRepository.save(new Store("testStore#1")).getId();
+        List<StoreCouponSaveRequestDto> requestDtoList = IntStream.range(0, 5)
+            .mapToObj(i -> StoreCouponSaveRequestDto.builder()
+                .name("name#" + i)
+                .amount(1000L * (i + 1))
+                .daysAfterIssuance(30)
+                .minOrderPrice(1000L * (i + 1))
+                .build())
+            .collect(Collectors.toList());
 
 		//When
-		ResultActions resultActions = mvc.perform(put("/api/v1/coupons/{storeId}/issuance", storeId)
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(requestDtoList)))
-			.andDo(print());
+        ResultActions resultActions = mvc.perform(put("/api/v1/coupons/{storeId}/issuance", storeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestDtoList)))
+            .andDo(print());
 
 		//TODO rest docs
 		//Then
-		resultActions
-			.andExpect(status().isMethodNotAllowed())
-			.andDo(print());
-	}
+        resultActions
+            .andExpect(status().isMethodNotAllowed())
+            .andDo(print());
+    }
 
-	private ResultActions requestCreateStoreCoupons(long storeId,
-		List<StoreCouponSaveRequestDto> requestDto)
-		throws Exception {
-		return mvc.perform(post("/api/v1/coupons/{storeId}/issuance", storeId)
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(requestDto)))
-			.andDo(print());
-	}
+    private ResultActions requestCreateStoreCoupons(long storeId,
+        List<StoreCouponSaveRequestDto> requestDto)
+        throws Exception {
+        return mvc.perform(post("/api/v1/coupons/{storeId}/issuance", storeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestDto)))
+            .andDo(print());
+    }
 }
 
