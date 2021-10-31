@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 public class TestCouponFactory {
 
     public static Coupon.CouponBuilder builder() {
-        return Coupon.builder("test coupon",
+        return Coupon.builder(
+                "test coupon",
                 1000L,
                 ExpirationPolicy.newByPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(30)),
                 DiscountType.FIXED_AMOUNT,
