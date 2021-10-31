@@ -73,7 +73,6 @@ class StoreRestControllerTest {
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.data", is(notNullValue())))
             .andExpect(jsonPath("$.error", is(nullValue())));
-
     }
 
     private ResultActions requestGetStoreCoupons(long storeId) throws Exception {
