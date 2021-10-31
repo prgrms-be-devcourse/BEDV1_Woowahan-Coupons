@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.util.Assert;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,11 +40,23 @@ public class CouponRedemption {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    public CouponRedemption(Coupon coupon) {
+    private CouponRedemption(Coupon coupon, Customer customer) {
+        Assert.notNull(coupon, "coupon must be not null");
         this.coupon = coupon;
+        this.customer = customer;
+        this.expirationPeriod = coupon.getExpirationPolicy().newExpirationPeriod();
     }
 
     public void changeCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public static CouponRedemption of(Coupon coupon) {
+        return new CouponRedemption(coupon, null);
+    }
+
+    public static CouponRedemption of(Coupon coupon, Customer customer) {
+        Assert.notNull(customer, "customer must be not null");
+        return new CouponRedemption(coupon, customer);
     }
 }

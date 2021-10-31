@@ -25,9 +25,9 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
     @Transactional
     @Override
-    public void allocateCouponToCustomer(UUID couponId, Long customerId) {
-        CouponRedemption couponRedemption = couponRedemptionRepository.findById(couponId)
-            .orElseThrow(() -> new CouponRedemptionNotFoundException(couponId));
+    public void allocateExistingCouponToCustomer(UUID couponCode, Long customerId) {
+        CouponRedemption couponRedemption = couponRedemptionRepository.findById(couponCode)
+            .orElseThrow(() -> new CouponRedemptionNotFoundException(couponCode));
         Customer customer = customerRepository.getById(customerId);
         couponRedemption.changeCustomer(customer);
     }

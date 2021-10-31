@@ -39,14 +39,14 @@ class SimpleCouponRedemptionServiceTest {
     void allocateCouponToCustomerSuccessTest() {
         //Given
         Long customerId = 1L;
-        CouponRedemption couponRedemption = new CouponRedemption(mock(Coupon.class));
+        CouponRedemption couponRedemption = CouponRedemption.of(mock(Coupon.class));
         Customer mockCustomer = mock(Customer.class);
         given(couponRedemptionRepository.findById(any())).willReturn(Optional.of(couponRedemption));
         given(customerRepository.getById(customerId)).willReturn(mockCustomer);
         given(mockCustomer.getId()).willReturn(customerId);
         //When
         assertThat(couponRedemption.getCustomer()).isNull();
-        couponRedemptionService.allocateCouponToCustomer(UUID.randomUUID(), customerId);
+        couponRedemptionService.allocateExistingCouponToCustomer(UUID.randomUUID(), customerId);
         //Then
         assertThat(couponRedemption.getCustomer()).isNotNull();
         assertThat(couponRedemption.getCustomer().getId()).isEqualTo(customerId);
@@ -58,7 +58,7 @@ class SimpleCouponRedemptionServiceTest {
         //Given
         given(couponRedemptionRepository.findById(any())).willReturn(Optional.empty());
         //When Then
-        assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomer(UUID.randomUUID(), 1L))
+        assertThatThrownBy(() -> couponRedemptionService.allocateExistingCouponToCustomer(UUID.randomUUID(), 1L))
             .isInstanceOf(CouponRedemptionNotFoundException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
     }
