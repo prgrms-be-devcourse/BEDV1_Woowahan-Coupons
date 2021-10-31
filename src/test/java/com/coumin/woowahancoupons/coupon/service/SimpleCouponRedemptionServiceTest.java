@@ -27,79 +27,84 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SimpleCouponRedemptionServiceTest {
 
-    @Mock
-    private CouponRedemptionRepository couponRedemptionRepository;
-    
-    @Mock
-    private CustomerRepository customerRepository;
+	@Mock
+	private CouponRedemptionRepository couponRedemptionRepository;
 
-    @Mock
-    private Coupon coupon;
+	@Mock
+	private CustomerRepository customerRepository;
 
-    @Mock
-    private Customer customer;
+	@Mock
+	private Coupon coupon;
 
-    @Mock
-    private ExpirationPolicy expirationPolicy;
-    
-    @InjectMocks
-    private SimpleCouponRedemptionService couponRedemptionService;
+	@Mock
+	private Customer customer;
 
-    @Test
-    @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 성공 테스트")
-    void allocateCouponToCustomerSuccessTest() {
-        //Given
-        given(coupon.getExpirationPolicy()).willReturn(expirationPolicy);
-        CouponRedemption couponRedemption = new CouponRedemption(coupon);
+	@Mock
+	private ExpirationPolicy expirationPolicy;
 
-        UUID issuanceCode = UUID.randomUUID();
-        given(couponRedemptionRepository.findByIssuanceCode(issuanceCode)).willReturn(Optional.of(couponRedemption));
+	@InjectMocks
+	private SimpleCouponRedemptionService couponRedemptionService;
 
-        Long customerId = 1L;
-        given(customerRepository.getById(customerId)).willReturn(customer);
-        given(customer.getId()).willReturn(customerId);
+	@Test
+	@DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 성공 테스트")
+	void allocateCouponToCustomerSuccessTest() {
+		//Given
+		given(coupon.getExpirationPolicy()).willReturn(expirationPolicy);
+		CouponRedemption couponRedemption = new CouponRedemption(coupon);
 
-        //When
-        assertThat(couponRedemption.getCustomer()).isNull();
-        couponRedemptionService.allocateCouponToCustomer(issuanceCode, customerId);
+		UUID issuanceCode = UUID.randomUUID();
+		given(couponRedemptionRepository.findByIssuanceCode(issuanceCode))
+			.willReturn(Optional.of(couponRedemption));
 
-        //Then
-        assertThat(couponRedemption.getCustomer()).isNotNull();
-        assertThat(couponRedemption.getCustomer().getId()).isEqualTo(customerId);
-    }
+		Long customerId = 1L;
+		given(customerRepository.getById(customerId)).willReturn(customer);
+		given(customer.getId()).willReturn(customerId);
 
-    @Test
-    @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 실패 테스트 (잘못된 쿠폰 Id)")
-    void allocateCouponToCustomerCodeFailureTest() {
-        //Given
-        UUID invalidId = UUID.randomUUID();
-        given(couponRedemptionRepository.findByIssuanceCode(invalidId)).willReturn(Optional.empty());
+		//When
+		assertThat(couponRedemption.getCustomer()).isNull();
+		couponRedemptionService.allocateCouponToCustomer(issuanceCode, customerId);
 
-        //When Then
-        assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomer(invalidId, 1L))
-            .isInstanceOf(CouponRedemptionNotFoundException.class)
-            .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
-    }
+		//Then
+		assertThat(couponRedemption.getCustomer()).isNotNull();
+		assertThat(couponRedemption.getCustomer().getId()).isEqualTo(customerId);
+	}
 
-    @Test
-    @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 실패 테스트 (이미 고객이 할당된 쿠폰)")
-    void allocateCouponToCustomerCustomerFailureTest() {
-        //Given
-        given(coupon.getExpirationPolicy()).willReturn(expirationPolicy);
-        CouponRedemption couponRedemption = spy(new CouponRedemption(coupon));
+	@Test
+	@DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 실패 테스트 (잘못된 쿠폰 Id)")
+	void allocateCouponToCustomerCodeFailureTest() {
+		//Given
+		UUID invalidId = UUID.randomUUID();
+		given(couponRedemptionRepository.findByIssuanceCode(invalidId)).willReturn(Optional.empty());
 
-        UUID issuanceCode = UUID.randomUUID();
-        given(couponRedemptionRepository.findByIssuanceCode(issuanceCode)).willReturn(Optional.of(couponRedemption));
+		//When Then
+		assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomer(invalidId, 1L))
+			.isInstanceOf(CouponRedemptionNotFoundException.class)
+			.hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
+	}
 
-        Long customerId = 1L;
-        given(customerRepository.getById(customerId)).willReturn(customer);
-        given(couponRedemption.getCustomer()).willReturn(customer);
-        willThrow(new CouponRedemptionAlreadyAllocateCustomer()).given(couponRedemption).allocateCustomer(customer);
+	@Test
+	@DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 실패 테스트 (이미 고객이 할당된 쿠폰)")
+	void allocateCouponToCustomerCustomerFailureTest() {
+		//Given
+		given(coupon.getExpirationPolicy()).willReturn(expirationPolicy);
+		CouponRedemption couponRedemption = spy(new CouponRedemption(coupon));
 
-        //When Then
-        assertThat(couponRedemption.getCustomer()).isNotNull();
-        assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomer(issuanceCode, customerId))
-            .isInstanceOf(CouponRedemptionAlreadyAllocateCustomer.class)
-            .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage());
-    }
+		UUID issuanceCode = UUID.randomUUID();
+		given(couponRedemptionRepository.findByIssuanceCode(issuanceCode))
+			.willReturn(Optional.of(couponRedemption));
+
+		Long customerId = 1L;
+		given(customerRepository.getById(customerId)).willReturn(customer);
+		given(couponRedemption.getCustomer()).willReturn(customer);
+		willThrow(new CouponRedemptionAlreadyAllocateCustomer())
+			.given(couponRedemption)
+			.allocateCustomer(customer);
+
+		//When Then
+		assertThat(couponRedemption.getCustomer()).isNotNull();
+		assertThatThrownBy(
+			() -> couponRedemptionService.allocateCouponToCustomer(issuanceCode, customerId))
+			.isInstanceOf(CouponRedemptionAlreadyAllocateCustomer.class)
+			.hasMessageContaining(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage());
+	}
 }

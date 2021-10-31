@@ -56,7 +56,7 @@ public class CouponRedemption extends BaseEntity {
 	}
 
 	public void verifyCustomer() {
-		if(customer != null) {
+		if (customer != null) {
 			throw new CouponRedemptionAlreadyAllocateCustomer();
 		}
 	}

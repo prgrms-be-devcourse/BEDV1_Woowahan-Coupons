@@ -23,7 +23,10 @@ public class ExpirationPeriod {
 
 	public static ExpirationPeriod from(ExpirationPolicy expirationPolicy) {
 		if (expirationPolicy.getExpirationPolicyType() == ExpirationPolicyType.PERIOD) {
-			return new ExpirationPeriod(expirationPolicy.getStartAt(), expirationPolicy.getExpiredAt());
+			return new ExpirationPeriod(
+				expirationPolicy.getStartAt(),
+				expirationPolicy.getExpiredAt()
+			);
 		} else {
 			LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
 			return new ExpirationPeriod(now, now.plusDays(expirationPolicy.getDaysFromIssuance()));

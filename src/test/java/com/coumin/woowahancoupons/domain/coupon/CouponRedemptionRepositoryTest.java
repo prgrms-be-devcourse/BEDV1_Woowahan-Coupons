@@ -51,7 +51,8 @@ class CouponRedemptionRepositoryTest {
 
 		//Then
 		SoftAssertions.assertSoftly(softAssertions -> {
-				softAssertions.assertThat(foundCouponRedemption.getId()).isEqualTo(couponRedemption.getId());
+				softAssertions.assertThat(foundCouponRedemption.getId())
+					.isEqualTo(couponRedemption.getId());
 			}
 		);
 	}

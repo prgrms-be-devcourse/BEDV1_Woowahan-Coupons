@@ -13,24 +13,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
-    private final CouponRedemptionRepository couponRedemptionRepository;
+	private final CouponRedemptionRepository couponRedemptionRepository;
 
-    private final CustomerRepository customerRepository;
+	private final CustomerRepository customerRepository;
 
-    public SimpleCouponRedemptionService(
-        CouponRedemptionRepository couponRedemptionRepository,
-        CustomerRepository customerRepository) {
-        this.couponRedemptionRepository = couponRedemptionRepository;
-        this.customerRepository = customerRepository;
-    }
+	public SimpleCouponRedemptionService(
+		CouponRedemptionRepository couponRedemptionRepository,
+		CustomerRepository customerRepository) {
+		this.couponRedemptionRepository = couponRedemptionRepository;
+		this.customerRepository = customerRepository;
+	}
 
-    @Transactional
-    @Override
-    public void allocateCouponToCustomer(UUID issuanceCode, Long customerId) {
-        CouponRedemption couponRedemption = couponRedemptionRepository.findByIssuanceCode(issuanceCode)
-            .orElseThrow(() -> new CouponRedemptionNotFoundException(issuanceCode));
-        Customer customer = customerRepository.getById(customerId);
+	@Transactional
+	@Override
+	public void allocateCouponToCustomer(UUID issuanceCode, Long customerId) {
+		CouponRedemption couponRedemption = couponRedemptionRepository
+			.findByIssuanceCode(issuanceCode)
+			.orElseThrow(() -> new CouponRedemptionNotFoundException(issuanceCode));
+		Customer customer = customerRepository.getById(customerId);
 
-        couponRedemption.allocateCustomer(customer);
-    }
+		couponRedemption.allocateCustomer(customer);
+	}
 }
