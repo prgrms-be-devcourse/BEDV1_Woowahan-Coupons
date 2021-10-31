@@ -97,4 +97,5 @@ public class Coupon extends BaseEntity {
             .issuerType(issuerType)
             .issuerId(issuerId);
     }
+
 }

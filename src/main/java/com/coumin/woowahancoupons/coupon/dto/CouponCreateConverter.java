@@ -30,8 +30,27 @@ public class CouponCreateConverter {
             .maxCount(dto.getMaxCount())
             .allocatedCount(dto.getAllocatedCount())
             .maxCountPerCustomer(dto.getMaxCountPerCustomer())
-            .promotionCode(dto.getPromotionCod())
+            .promotionCode(dto.getPromotionCode())
             .build();
+    }
+
+    public CouponCreateRequestDto convertToCouponCreateRequest(Coupon coupon) {
+        return new CouponCreateRequestDto(
+            coupon.getName(),
+            coupon.getAmount(),
+            coupon.getMinOrderPrice(),
+            coupon.getDiscountType().name(),
+            coupon.getIssuerType().name(),
+            coupon.getIssuerId(),
+            coupon.getMaxCount(),
+            coupon.getAllocatedCount(),
+            coupon.getMaxCountPerCustomer(),
+            coupon.getPromotionCode(),
+            coupon.getExpirationPolicy().getExpirationPolicyType().name(),
+            coupon.getExpirationPolicy().getStartAt(),
+            coupon.getExpirationPolicy().getExpiredAt(),
+            coupon.getExpirationPolicy().getDaysFromIssuance()
+        );
     }
 
     public CouponCreateResponseDto convertToCouponCreateResponse(Coupon coupon) {
