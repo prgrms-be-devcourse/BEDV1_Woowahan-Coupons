@@ -25,8 +25,8 @@ public class CouponRestController {
     @PostMapping("/{storeId}/issuance")
     public ApiResponse<Object> createStoreCoupons(
         @PathVariable long storeId,
-        @RequestBody @Valid StoreCouponSaveRequestDto storeCouponSaveRequestDto) {
-
+        @RequestBody @Valid StoreCouponSaveRequestDto storeCouponSaveRequestDto
+    ) {
         couponService.saveAllStoreCoupons(storeId, storeCouponSaveRequestDto);
         return ApiResponse.success();
     }
@@ -35,7 +35,8 @@ public class CouponRestController {
     public ApiResponse<CouponCreateResponseDto> save(
         @RequestBody CouponCreateRequestDto couponCreateDto
     ) {
-        CouponCreateResponseDto couponCreateResponse = couponService.generateCoupon(couponCreateDto);
+        CouponCreateResponseDto couponCreateResponse = couponService
+            .generateCoupon(couponCreateDto);
         return ApiResponse.success(couponCreateResponse);
     }
 }

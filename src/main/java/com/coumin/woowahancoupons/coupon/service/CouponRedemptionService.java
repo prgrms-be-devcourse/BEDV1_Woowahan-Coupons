@@ -3,5 +3,6 @@ package com.coumin.woowahancoupons.coupon.service;
 import java.util.UUID;
 
 public interface CouponRedemptionService {
+
     void allocateExistingCouponToCustomer(UUID couponCode, Long customerId);
 }
