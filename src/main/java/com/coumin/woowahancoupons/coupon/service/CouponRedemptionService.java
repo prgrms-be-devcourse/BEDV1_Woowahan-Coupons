@@ -4,5 +4,5 @@ import java.util.UUID;
 
 public interface CouponRedemptionService {
 
-	void allocateCouponToCustomer(UUID issuanceCode, Long customerId);
+    void allocateCouponToCustomer(UUID issuanceCode, Long customerId);
 }

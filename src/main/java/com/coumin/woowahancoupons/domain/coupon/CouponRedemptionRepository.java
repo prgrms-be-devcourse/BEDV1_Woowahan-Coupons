@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CouponRedemptionRepository extends JpaRepository<CouponRedemption, UUID> {
 
-	Optional<CouponRedemption> findByIssuanceCode(UUID issuanceCode);
+    Optional<CouponRedemption> findByIssuanceCode(UUID issuanceCode);
 
 }

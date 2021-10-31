@@ -59,7 +59,8 @@ class ExpirationPolicyTest {
 
         //Then
         SoftAssertions.assertSoftly(softAssertions -> {
-                softAssertions.assertThat(expirationPolicy.getExpirationPolicyType()).isEqualTo(expirationPolicyType);
+                softAssertions.assertThat(expirationPolicy.getExpirationPolicyType())
+                    .isEqualTo(expirationPolicyType);
                 softAssertions.assertThat(expirationPolicy.getDaysFromIssuance()).isEqualTo(days);
             }
         );
