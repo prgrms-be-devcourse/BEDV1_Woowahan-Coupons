@@ -68,10 +68,14 @@ class CouponRepositoryTest {
         //Given
         long issuerId = 1L;
         List<Coupon> createdCouponByAdmin1 = IntStream.range(0, 3)
-            .mapToObj(i -> TestCouponFactory.builder(1L).build())
+            .mapToObj(i -> TestCouponFactory.builder()
+                .issuerId(1L)
+                .build())
             .collect(Collectors.toList());
         List<Coupon> createdCouponByAdmin2 = IntStream.range(0, 3)
-            .mapToObj(i -> TestCouponFactory.builder(2L).build())
+            .mapToObj(i -> TestCouponFactory.builder()
+                .issuerId(2L)
+                .build())
             .collect(Collectors.toList());
 
         createdCouponByAdmin1.forEach(coupon -> entityManager.persist(coupon));

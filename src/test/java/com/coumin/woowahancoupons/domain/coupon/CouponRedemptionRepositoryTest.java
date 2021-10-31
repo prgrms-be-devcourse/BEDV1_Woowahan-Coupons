@@ -27,6 +27,7 @@ class CouponRedemptionRepositoryTest {
         //Given
         LocalDateTime now = LocalDateTime.now().minusMinutes(1);
         Coupon coupon = TestCouponFactory.builder().build();
+        entityManager.persist(coupon);
         CouponRedemption couponRedemption = CouponRedemption.of(coupon);
 
         //When
@@ -45,6 +46,7 @@ class CouponRedemptionRepositoryTest {
     void findCouponRedemptionByIssuanceCodeTest() {
         //Given
         Coupon coupon = TestCouponFactory.builder().build();
+        entityManager.persist(coupon);
         CouponRedemption couponRedemption = CouponRedemption.of(coupon);
         entityManager.persist(couponRedemption);
 

@@ -50,8 +50,10 @@ class SimpleCouponRedemptionServiceTest {
 
         //When
         assertThat(couponRedemption.getCustomer()).isNull();
-        couponRedemptionService
-            .allocateExistingCouponToCustomer(couponRedemption.getCouponCode(), customerId);
+        couponRedemptionService.allocateExistingCouponToCustomer(
+            couponRedemption.getCouponCode(),
+            customerId
+        );
 
         //Then
         assertThat(couponRedemption.getCustomer()).isNotNull();
@@ -63,7 +65,7 @@ class SimpleCouponRedemptionServiceTest {
     void allocateCouponToCustomerFailureTest() {
         //Given
         UUID invalidId = UUID.randomUUID();
-        given(couponRedemptionRepository.findById(invalidId)).willReturn(Optional.empty());
+        given(couponRedemptionRepository.findByCouponCode(invalidId)).willReturn(Optional.empty());
 
         //When Then
         assertThatThrownBy(
