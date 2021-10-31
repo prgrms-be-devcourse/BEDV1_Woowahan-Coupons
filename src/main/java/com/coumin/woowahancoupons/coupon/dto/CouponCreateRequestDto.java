@@ -2,7 +2,6 @@ package com.coumin.woowahancoupons.coupon.dto;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,11 +37,10 @@ public class CouponCreateRequestDto {
 
     private Integer daysFromIssuance;
 
-    @Builder
-    public CouponCreateRequestDto(String name, Long amount, Long minOrderPrice, String discountType,
-                                  String issuerType, Long issuerId, Integer maxCount, Integer allocatedCount,
-                                  Integer maxCountPerCustomer, String promotionCode, String expirationPolicyType,
-                                  LocalDateTime startAt, LocalDateTime expiredAt, Integer daysFromIssuance) {
+    public CouponCreateRequestDto(String name, Long amount, Long minOrderPrice, String discountType, String issuerType, Long issuerId,
+                                  Integer maxCount, Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode,
+                                  String expirationPolicyType, LocalDateTime startAt, LocalDateTime expiredAt,
+                                  Integer daysFromIssuance) {
         this.name = name;
         this.amount = amount;
         this.minOrderPrice = minOrderPrice;

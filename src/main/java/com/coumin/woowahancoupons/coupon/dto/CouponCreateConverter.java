@@ -34,6 +34,25 @@ public class CouponCreateConverter {
             .build();
     }
 
+    public CouponCreateRequestDto convertToCouponCreateRequest(Coupon coupon) {
+        return new CouponCreateRequestDto(
+            coupon.getName(),
+            coupon.getAmount(),
+            coupon.getMinOrderPrice(),
+            coupon.getDiscountType().name(),
+            coupon.getIssuerType().name(),
+            coupon.getIssuerId(),
+            coupon.getMaxCount(),
+            coupon.getAllocatedCount(),
+            coupon.getMaxCountPerCustomer(),
+            coupon.getPromotionCode(),
+            coupon.getExpirationPolicy().getExpirationPolicyType().name(),
+            coupon.getExpirationPolicy().getStartAt(),
+            coupon.getExpirationPolicy().getExpiredAt(),
+            coupon.getExpirationPolicy().getDaysFromIssuance()
+        );
+    }
+
     public CouponCreateResponseDto convertToCouponCreateResponse(Coupon coupon) {
         return CouponCreateResponseDto.builder()
             .name(coupon.getName())

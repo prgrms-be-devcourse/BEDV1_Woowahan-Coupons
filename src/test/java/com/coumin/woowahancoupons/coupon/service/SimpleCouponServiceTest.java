@@ -8,16 +8,12 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
-import com.coumin.woowahancoupons.domain.coupon.DiscountType;
-import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicyType;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;

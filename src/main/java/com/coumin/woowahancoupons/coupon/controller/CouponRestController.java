@@ -31,7 +31,7 @@ public class CouponRestController {
         return ApiResponse.success();
     }
 
-    @PostMapping()
+    @PostMapping
     public ApiResponse<CouponCreateResponseDto> save(
         @RequestBody CouponCreateRequestDto couponCreateDto
     ) {
