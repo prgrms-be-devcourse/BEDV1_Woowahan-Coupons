@@ -1,4 +1,4 @@
-package com.coumin.woowahancoupons.domain;
+package com.coumin.woowahancoupons.domain.coupon;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
@@ -61,8 +61,10 @@ class ExpirationPolicyTest {
 
         //Then
         SoftAssertions.assertSoftly(softAssertions -> {
-                softAssertions.assertThat(expirationPolicy.getExpirationPolicyType()).isEqualTo(expirationPolicyType);
-                softAssertions.assertThat(expirationPolicy.getDaysFromIssuance()).isEqualTo(days);
+                softAssertions.assertThat(expirationPolicy.getExpirationPolicyType())
+                    .isEqualTo(expirationPolicyType);
+                softAssertions.assertThat(expirationPolicy.getDaysFromIssuance())
+                    .isEqualTo(days);
             }
         );
     }

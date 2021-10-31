@@ -4,6 +4,7 @@ import com.coumin.woowahancoupons.domain.BaseEntity;
 import lombok.*;
 import javax.persistence.*;
 import java.util.*;
+import org.springframework.util.Assert;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -81,12 +82,12 @@ public class Coupon extends BaseEntity {
         IssuerType issuerType,
         Long issuerId
     ) {
-        Objects.requireNonNull(name, "name must not be null!");
-        Objects.requireNonNull(amount, "amount must not be null!");
-        Objects.requireNonNull(expirationPolicy, "expirationPolicy must not be null!");
-        Objects.requireNonNull(discountType, "discountType must not be null!");
-        Objects.requireNonNull(issuerType, "issuerType must not be null!");
-        Objects.requireNonNull(issuerId, "issuerId must not be null!");
+        Assert.notNull(name, "name must not be null!");
+        Assert.notNull(amount, "amount must not be null!");
+        Assert.notNull(expirationPolicy, "expirationPolicy must not be null!");
+        Assert.notNull(discountType, "discountType must not be null!");
+        Assert.notNull(issuerType, "issuerType must not be null!");
+        Assert.notNull(issuerId, "issuerId must not be null!");
 
         return internalBuilder()
             .name(name)

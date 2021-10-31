@@ -1,7 +1,9 @@
 package com.coumin.woowahancoupons.domain.coupon;
 
+import com.coumin.woowahancoupons.domain.BaseEntity;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.Order;
+import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,12 +14,15 @@ import org.springframework.util.Assert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "coupon_redemptions")
 @Entity
-public class CouponRedemption {
+public class CouponRedemption extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coupon_redemption_id")
-    private UUID id;
+    private Long id;
+
+    @Column(name = "coupon_code", nullable = false, unique = true)
+    private UUID couponCode;
 
     @Column(name = "use_yn", nullable = false)
     private boolean used;
@@ -42,13 +47,10 @@ public class CouponRedemption {
 
     private CouponRedemption(Coupon coupon, Customer customer) {
         Assert.notNull(coupon, "coupon must be not null");
+
         this.coupon = coupon;
         this.customer = customer;
         this.expirationPeriod = coupon.getExpirationPolicy().newExpirationPeriod();
-    }
-
-    public void changeCustomer(Customer customer) {
-        this.customer = customer;
     }
 
     public static CouponRedemption of(Coupon coupon) {
@@ -57,6 +59,18 @@ public class CouponRedemption {
 
     public static CouponRedemption of(Coupon coupon, Customer customer) {
         Assert.notNull(customer, "customer must be not null");
+
         return new CouponRedemption(coupon, customer);
+    }
+
+    public void allocateCustomer(Customer customer) {
+        verifyCustomer();
+        this.customer = customer;
+    }
+
+    public void verifyCustomer() {
+        if (customer != null) {
+            throw new CouponRedemptionAlreadyAllocateCustomer();
+        }
     }
 }

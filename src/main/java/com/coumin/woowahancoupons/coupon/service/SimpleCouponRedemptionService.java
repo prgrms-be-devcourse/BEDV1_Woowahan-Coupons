@@ -29,6 +29,7 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
         CouponRedemption couponRedemption = couponRedemptionRepository.findById(couponCode)
             .orElseThrow(() -> new CouponRedemptionNotFoundException(couponCode));
         Customer customer = customerRepository.getById(customerId);
-        couponRedemption.changeCustomer(customer);
+
+        couponRedemption.allocateCustomer(customer);
     }
 }

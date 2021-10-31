@@ -41,7 +41,7 @@ class SimpleCouponRedemptionServiceTest {
         Long customerId = 1L;
         CouponRedemption couponRedemption = CouponRedemption.of(mock(Coupon.class));
         Customer mockCustomer = mock(Customer.class);
-        given(couponRedemptionRepository.findById(any())).willReturn(Optional.of(couponRedemption));
+        given(couponRedemptionRepository.findByCouponCode(any())).willReturn(Optional.of(couponRedemption));
         given(customerRepository.getById(customerId)).willReturn(mockCustomer);
         given(mockCustomer.getId()).willReturn(customerId);
         //When
@@ -56,9 +56,10 @@ class SimpleCouponRedemptionServiceTest {
     @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 발급 - 실패 테스트 (잘못된 쿠폰 Id)")
     void allocateCouponToCustomerFailureTest() {
         //Given
-        given(couponRedemptionRepository.findById(any())).willReturn(Optional.empty());
+        UUID invalidId = UUID.randomUUID();
+        given(couponRedemptionRepository.findById(invalidId)).willReturn(Optional.empty());
         //When Then
-        assertThatThrownBy(() -> couponRedemptionService.allocateExistingCouponToCustomer(UUID.randomUUID(), 1L))
+        assertThatThrownBy(() -> couponRedemptionService.allocateExistingCouponToCustomer(invalidId, 1L))
             .isInstanceOf(CouponRedemptionNotFoundException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
     }
