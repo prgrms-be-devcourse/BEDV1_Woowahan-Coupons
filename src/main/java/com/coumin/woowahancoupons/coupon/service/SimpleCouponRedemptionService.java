@@ -25,8 +25,8 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
     public SimpleCouponRedemptionService(
         CouponRedemptionRepository couponRedemptionRepository,
-        CustomerRepository customerRepository, CouponRepository couponRepository)
-    {
+        CustomerRepository customerRepository, CouponRepository couponRepository
+    ) {
         this.couponRedemptionRepository = couponRedemptionRepository;
         this.customerRepository = customerRepository;
         this.couponRepository = couponRepository;

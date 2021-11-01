@@ -2,6 +2,7 @@ package com.coumin.woowahancoupons.coupon.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -15,8 +16,10 @@ import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
+import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
+import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -69,15 +72,15 @@ class SimpleCouponRedemptionServiceTest {
     }
 
     @Test
-    @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 등록 - 실패 테스트 (잘못된 쿠폰 Id)")
+    @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 등록 - 실패 테스트 (잘못된 쿠폰 코드)")
     void allocateExistingCouponToCustomerFailureTest() {
         //Given
-        UUID invalidId = UUID.randomUUID();
-        given(couponRedemptionRepository.findByCouponCode(invalidId)).willReturn(Optional.empty());
+        UUID invalidCouponCode = UUID.randomUUID();
+        given(couponRedemptionRepository.findByCouponCode(invalidCouponCode)).willReturn(Optional.empty());
 
         //When Then
         assertThatThrownBy(
-            () -> couponRedemptionService.allocateExistingCouponToCustomer(invalidId, 1L))
+            () -> couponRedemptionService.allocateExistingCouponToCustomer(invalidCouponCode, 1L))
             .isInstanceOf(CouponRedemptionNotFoundException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
     }
@@ -131,5 +134,40 @@ class SimpleCouponRedemptionServiceTest {
         CouponRedemption captorCouponRedemption = captor.getValue();
         assertThat(captorCouponRedemption.getCoupon().getId()).isEqualTo(couponId);
         assertThat(captorCouponRedemption.getCustomer().getId()).isEqualTo(customerId);
+    }
+
+    @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (잘못된 쿠폰 Id)")
+    void allocateCouponToCustomerWithIssuanceFailureTest() {
+        //Given
+        Long invalidCouponId = 1L;
+        Long customerId = 1L;
+
+        given(couponRepository.findById(invalidCouponId)).willReturn(Optional.empty());
+
+        //When Then
+        assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomerWithIssuance(
+            invalidCouponId,
+            customerId))
+            .isInstanceOf(CouponNotFoundException.class)
+            .hasMessageContaining(ErrorCode.COUPON_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (잘못된 고객 Id)")
+    void allocateCouponToCustomerWithIssuanceFailureTest2() {
+        //Given
+        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        Long invalidCustomerId = 1L;
+
+        given(couponRepository.findById(any())).willReturn(Optional.of(spyCoupon));
+        given(customerRepository.findById(invalidCustomerId)).willReturn(Optional.empty());
+
+        //When Then
+        assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomerWithIssuance(
+            spyCoupon.getId(),
+            invalidCustomerId))
+            .isInstanceOf(CustomerNotFoundException.class)
+            .hasMessageContaining(ErrorCode.CUSTOMER_NOT_FOUND.getMessage());
     }
 }
