@@ -119,6 +119,7 @@ class SimpleCouponRedemptionServiceTest {
         Long couponId = 1L;
         Customer mockCustomer = mock(Customer.class);
         Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        ArgumentCaptor<CouponRedemption> CouponRedemptionCaptor = ArgumentCaptor.forClass(CouponRedemption.class);
 
         given(spyCoupon.getId()).willReturn(couponId);
         given(mockCustomer.getId()).willReturn(customerId);
@@ -129,9 +130,8 @@ class SimpleCouponRedemptionServiceTest {
         couponRedemptionService.allocateCouponToCustomerWithIssuance(spyCoupon.getId(), customerId);
 
         //Then
-        ArgumentCaptor<CouponRedemption> captor = ArgumentCaptor.forClass(CouponRedemption.class);
-        then(couponRedemptionRepository).should().save(captor.capture());
-        CouponRedemption captorCouponRedemption = captor.getValue();
+        then(couponRedemptionRepository).should().save(CouponRedemptionCaptor.capture());
+        CouponRedemption captorCouponRedemption = CouponRedemptionCaptor.getValue();
         assertThat(captorCouponRedemption.getCoupon().getId()).isEqualTo(couponId);
         assertThat(captorCouponRedemption.getCustomer().getId()).isEqualTo(customerId);
     }
