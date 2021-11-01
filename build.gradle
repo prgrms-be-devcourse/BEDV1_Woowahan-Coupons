@@ -3,6 +3,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.asciidoctor.convert' version '1.5.8'
     id 'java'
+    id 'jacoco'
+    id "org.sonarqube" version "3.3"
 }
 
 group = 'com.coumin'
@@ -17,6 +19,14 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "prgrms-be-devcourse_BEDV1_Woowahan-Coupons"
+        property "sonar.organization", "prgrms-be-devcourse"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 ext {
@@ -38,7 +48,35 @@ dependencies {
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        html.destination file("$buildDir/jacocoHtml")
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            enabled = true
+            element = 'BUNDLE'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.90
+            }
+
+            excludes = []
+        }
+    }
+}
+
+
 
 asciidoctor {
     inputs.dir snippetsDir
