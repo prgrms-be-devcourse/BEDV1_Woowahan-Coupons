@@ -12,6 +12,7 @@ public enum ErrorCode {
     STORE_NOT_FOUND(400, "C003", "Can not find a Store for id "),
     COUPON_NOT_FOUND(400, "CP01", "Can not find a Coupon for id "),
     CUSTOMER_NOT_FOUND(400, "CT01", "Can not find a Customer for id "),
+    ADMIN_NOT_FOUND(400, "AI01", "Can not find a Admin for id "),
 
     INVALID_INPUT_VALUE(400, "C004", "Invalid Input Value"),
     METHOD_NOT_ALLOWED(405, "C005", "Method not allowed"),

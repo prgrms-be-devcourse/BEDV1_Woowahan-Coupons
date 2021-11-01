@@ -1,18 +1,11 @@
 package com.coumin.woowahancoupons.coupon.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
-
 import com.coumin.woowahancoupons.coupon.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.dto.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdmin;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdminRepository;
-import com.coumin.woowahancoupons.global.error.ErrorCode;
-import com.coumin.woowahancoupons.global.exception.AdminNotFoundException;
-import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
