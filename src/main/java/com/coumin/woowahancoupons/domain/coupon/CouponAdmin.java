@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Table(name = "admin")
 @Entity
 public class CouponAdmin extends BaseEntity {
@@ -17,4 +18,7 @@ public class CouponAdmin extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String name;
 
+    public CouponAdmin(String name) {
+        this.name = name;
+    }
 }

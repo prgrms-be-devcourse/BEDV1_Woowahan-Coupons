@@ -8,5 +8,5 @@ public interface CouponService {
 
     void saveAllStoreCoupons(Long storeId, StoreCouponSaveRequestDto requestDto);
 
-    CouponCreateResponseDto generateCoupon(CouponCreateRequestDto couponCreateRequest);
+    CouponCreateResponseDto generateCoupon(CouponCreateRequestDto couponCreateRequest, Long couponAdminId);
 }
