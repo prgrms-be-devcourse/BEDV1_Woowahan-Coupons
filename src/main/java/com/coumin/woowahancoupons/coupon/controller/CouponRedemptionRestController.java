@@ -5,6 +5,7 @@ import com.coumin.woowahancoupons.global.ApiResponse;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +25,15 @@ public class CouponRedemptionRestController {
         @PathVariable("customerId") Long customerId
     ) {
         couponRedemptionService.allocateExistingCouponToCustomer(couponCode, customerId);
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/{couponId}/customers/{customerId}/allocate")
+    public ApiResponse<Object> allocateCoupon(
+        @PathVariable("couponId") Long couponId,
+        @PathVariable("customerId") Long customerId
+    ) {
+        couponRedemptionService.allocateCouponToCustomerWithIssuance(couponId, customerId);
         return ApiResponse.success();
     }
 }

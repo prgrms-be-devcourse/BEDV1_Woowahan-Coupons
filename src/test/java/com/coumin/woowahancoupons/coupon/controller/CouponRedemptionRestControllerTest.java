@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -57,11 +58,11 @@ class CouponRedemptionRestControllerTest {
     @Test
     @DisplayName("고객이 쿠폰 번호를 입력해 쿠폰 등록 - 성공 테스트")
     void registerCouponCodeSuccessTest() throws Exception {
-        //given
+        //Given
         CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
         entityManager.persist(couponRedemption);
 
-        //when
+        //When
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
                 couponRedemption.getCouponCode(),
@@ -69,7 +70,7 @@ class CouponRedemptionRestControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
         );
 
-        //then
+        //Then
         result.andDo(print())
             .andExpect(status().isOk())
             .andExpect(handler().handlerType(CouponRedemptionRestController.class))
@@ -79,20 +80,20 @@ class CouponRedemptionRestControllerTest {
     }
 
     @Test
-    @DisplayName("고객이 쿠폰 번호를 입력해 쿠폰 등록 - 실패 테스트 (잘못된 쿠폰 번호)")
+    @DisplayName("고객이 쿠폰 번호를 입력해 쿠폰 등록 - 실패 테스트 (잘못된 쿠폰 코드)")
     void registerCouponCodeFailureTest() throws Exception {
-        //given
-        UUID wrongCouponCode = UUID.randomUUID();
+        //Given
+        UUID invalidCouponCode = UUID.randomUUID();
 
-        //when
+        //When
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
-                wrongCouponCode,
+                invalidCouponCode,
                 testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
 
-        //then
+        //Then
         result.andDo(print())
             .andExpect(status().is4xxClientError())
             .andExpect(handler().handlerType(CouponRedemptionRestController.class))
@@ -106,18 +107,20 @@ class CouponRedemptionRestControllerTest {
     @Test
     @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 등록 - 실패 테스트 (이미 등록된 쿠폰)")
     void registerCouponCodeFailureTest2() throws Exception {
-        //given
+        //Given
         CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
         entityManager.persist(couponRedemption);
         couponRedemptionService.allocateExistingCouponToCustomer(couponRedemption.getCouponCode(), testCustomer.getId());
-        //when
+
+        //When
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
                 couponRedemption.getCouponCode(),
                 testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
-        //then
+
+        //Then
         result.andDo(print())
             .andExpect(status().is4xxClientError())
             .andExpect(handler().handlerType(CouponRedemptionRestController.class))
@@ -126,5 +129,75 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
             .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
+    }
+
+    @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 성공 테스트")
+    void allocateCouponSuccessTest() throws Exception {
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
+                testCoupon.getId(),
+                testCustomer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("allocateCoupon"))
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
+
+    @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (잘못된 쿠폰 Id)")
+    void allocateCouponFailureTest() throws Exception {
+        //Given
+        Long invalidCouponId = 0L;
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
+                invalidCouponId,
+                testCustomer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("allocateCoupon"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_NOT_FOUND.getCode())))
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_NOT_FOUND.getMessage())));
+    }
+
+    @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (잘못된 고객 Id)")
+    void allocateCouponFailureTest2() throws Exception {
+        //Given
+        Long invalidCustomerId = 0L;
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
+                testCoupon.getId(),
+                invalidCustomerId)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("allocateCoupon"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.CUSTOMER_NOT_FOUND.getCode())))
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.CUSTOMER_NOT_FOUND.getMessage())));
     }
 }
