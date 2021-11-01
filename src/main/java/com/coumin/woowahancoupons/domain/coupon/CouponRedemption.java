@@ -3,11 +3,14 @@ package com.coumin.woowahancoupons.domain.coupon;
 import com.coumin.woowahancoupons.domain.BaseEntity;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.Order;
+import com.coumin.woowahancoupons.global.exception.CouponAlreadyUseException;
+import com.coumin.woowahancoupons.global.exception.CouponExpireException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.util.Assert;
 
 @Getter
@@ -69,9 +72,28 @@ public class CouponRedemption extends BaseEntity {
         this.customer = customer;
     }
 
+    public void use() {
+        verifyExpiration();
+        verifyUsed();
+        this.used = true;
+        this.usedAt = LocalDateTime.now();
+    }
+
     public void verifyCustomer() {
         if (customer != null) {
             throw new CouponRedemptionAlreadyAllocateCustomer();
+        }
+    }
+
+    private void verifyExpiration() {
+        if (expirationPeriod.isExpiration()) {
+            throw new CouponExpireException();
+        }
+    }
+
+    private void verifyUsed() {
+        if (used) {
+            throw new CouponAlreadyUseException();
         }
     }
 }
