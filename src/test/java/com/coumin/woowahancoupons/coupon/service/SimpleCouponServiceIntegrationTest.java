@@ -1,11 +1,18 @@
 package com.coumin.woowahancoupons.coupon.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.verify;
+
 import com.coumin.woowahancoupons.coupon.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.dto.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdmin;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdminRepository;
+import com.coumin.woowahancoupons.global.error.ErrorCode;
+import com.coumin.woowahancoupons.global.exception.AdminNotFoundException;
+import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,11 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 class SimpleCouponServiceIntegrationTest {
 
     @Autowired
-    private CouponService couponService;
-
-    @Autowired
     CouponAdminRepository couponAdminRepository;
-
+    @Autowired
+    private CouponService couponService;
     @Autowired
     private CouponConverter couponConverter;
 
@@ -34,7 +39,7 @@ class SimpleCouponServiceIntegrationTest {
         CouponAdmin couponAdmin = new CouponAdmin("Admin_WOOCOU");
 
         Long couponAdminId = couponAdminRepository.save(couponAdmin).getId();
-        
+
         CouponCreateRequestDto couponCreateRequestDto = couponConverter
             .convertToCouponCreateRequest(
                 TestCouponFactory.builder()
@@ -48,20 +53,22 @@ class SimpleCouponServiceIntegrationTest {
             );
 
         //When
-        CouponCreateResponseDto couponCreateResponseDto = couponService.generateCoupon(couponCreateRequestDto, couponAdminId);
+        CouponCreateResponseDto couponCreateResponseDto = couponService.generateCoupon(
+            couponCreateRequestDto, couponAdminId);
 
         //Then
-        SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThat(couponCreateRequestDto.getName())
+        SoftAssertions.assertSoftly(soft -> {
+            soft.assertThat(couponCreateRequestDto.getName())
                 .isEqualTo(couponCreateResponseDto.getName());
-            softAssertions.assertThat(couponCreateRequestDto.getAmount())
+            soft.assertThat(couponCreateRequestDto.getAmount())
                 .isEqualTo(couponCreateResponseDto.getAmount());
-            softAssertions.assertThat(couponCreateRequestDto.getMinOrderPrice())
+            soft.assertThat(couponCreateRequestDto.getMinOrderPrice())
                 .isEqualTo(couponCreateResponseDto.getMinOrderPrice());
-            softAssertions.assertThat(couponCreateRequestDto.getDiscountType())
+            soft.assertThat(couponCreateRequestDto.getDiscountType())
                 .isEqualTo(couponCreateResponseDto.getDiscountType());
-            softAssertions.assertThat(couponCreateRequestDto.getIssuerType())
+            soft.assertThat(couponCreateRequestDto.getIssuerType())
                 .isEqualTo(couponCreateResponseDto.getIssuerType());
         });
+
     }
 }
