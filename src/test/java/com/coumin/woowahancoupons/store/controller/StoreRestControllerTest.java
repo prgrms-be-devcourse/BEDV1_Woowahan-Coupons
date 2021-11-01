@@ -1,7 +1,7 @@
 package com.coumin.woowahancoupons.store.controller;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -20,6 +20,7 @@ import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +50,13 @@ class StoreRestControllerTest {
     void findStoreCouponsTest() throws Exception {
         //Given
         long storeId = storeRepository.save(new Store("testStore#1")).getId();
-        List<Coupon> storeCoupons = IntStream.range(0, 3)
+        List<Coupon> storeCoupons = LongStream.range(0, 3)
             .mapToObj(i -> TestCouponFactory.builder()
-                .id((long) i)
                 .name("store coupon#" + i)
-                .amount(1000L * (i + 1))
+                .amount(1000 * (i + 1))
                 .expirationPolicy(ExpirationPolicy.newByAfterIssueDate(14))
                 .discountType(DiscountType.FIXED_AMOUNT)
+                .minOrderPrice(1000 * (i + 1))
                 .issuerType(IssuerType.STORE)
                 .issuerId(storeId)
                 .build())
@@ -66,12 +67,17 @@ class StoreRestControllerTest {
         ResultActions resultActions = requestGetStoreCoupons(storeId);
 
         //Then
-        resultActions.andDo(print())
+        resultActions
             .andExpect(status().isOk())
             .andExpect(handler().handlerType(StoreRestController.class))
             .andExpect(handler().methodName("getStoreCoupons"))
             .andExpect(jsonPath("$.success", is(true)))
-            .andExpect(jsonPath("$.data", is(notNullValue())))
+            .andExpect(jsonPath("$.data", hasSize(storeCoupons.size())))
+            .andExpect(jsonPath("$.data[0].id", is(storeCoupons.get(0).getId().intValue())))
+            .andExpect(jsonPath("$.data[0].name", is(storeCoupons.get(0).getName())))
+            .andExpect(jsonPath("$.data[0].amount", is(storeCoupons.get(0).getAmount().intValue())))
+            .andExpect(jsonPath("$.data[0].minOrderPrice", is(storeCoupons.get(0).getMinOrderPrice().intValue())))
+            .andExpect(jsonPath("$.data[0].daysAfterIssuance", is(storeCoupons.get(0).getExpirationPolicy().getDaysFromIssuance())))
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
