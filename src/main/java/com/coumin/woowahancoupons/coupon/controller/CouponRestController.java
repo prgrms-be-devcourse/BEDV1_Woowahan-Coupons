@@ -31,12 +31,12 @@ public class CouponRestController {
         return ApiResponse.success();
     }
 
-    @PostMapping
+    @PostMapping("/{couponAdminId}")
     public ApiResponse<CouponCreateResponseDto> save(
-        @RequestBody CouponCreateRequestDto couponCreateDto
+        @PathVariable Long couponAdminId,
+        @RequestBody CouponCreateRequestDto couponCreateRequestDto
     ) {
-        CouponCreateResponseDto couponCreateResponse = couponService
-            .generateCoupon(couponCreateDto);
+        CouponCreateResponseDto couponCreateResponse = couponService.generateCoupon(couponCreateRequestDto, couponAdminId);
         return ApiResponse.success(couponCreateResponse);
     }
 }
