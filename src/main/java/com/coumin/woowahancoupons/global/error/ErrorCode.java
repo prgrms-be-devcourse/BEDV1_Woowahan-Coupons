@@ -16,7 +16,9 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(400, "C004", "Invalid Input Value"),
     METHOD_NOT_ALLOWED(405, "C005", "Method not allowed"),
 
-    COUPON_REDEMPTION_ALREADY_ALLOCATE(400, "CO06", "Already allocated for customer");
+    COUPON_REDEMPTION_ALREADY_ALLOCATE(400, "CO06", "CouponRedemption was already allocated"),
+    COUPON_REDEMPTION_ALREADY_USE(400, "CO07", "CouponRedemption was already used"),
+    COUPON_REDEMPTION_EXPIRE(400, "CO08", "CouponRedemption was already expired");
 
     private final int status;
     private final String code;
