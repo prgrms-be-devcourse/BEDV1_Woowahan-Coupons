@@ -51,4 +51,14 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
         couponRedemptionRepository.save(CouponRedemption.of(coupon, customer));
     }
+
+    @Transactional
+    @Override
+    public void issueCouponCode(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId)
+            .orElseThrow(() -> new CouponNotFoundException(couponId));
+        if (coupon.canIssueCouponCode()) {
+            couponRedemptionRepository.save(CouponRedemption.of(coupon));
+        }
+    }
 }

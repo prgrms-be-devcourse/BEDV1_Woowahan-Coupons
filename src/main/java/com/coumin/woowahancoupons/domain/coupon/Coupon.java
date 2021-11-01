@@ -98,4 +98,8 @@ public class Coupon extends BaseEntity {
             .issuerType(issuerType)
             .issuerId(issuerId);
     }
+
+    public boolean canIssueCouponCode() {
+        return allocatedCount + 1 <= maxCount;
+    }
 }
