@@ -32,7 +32,7 @@ public class CouponRestController {
     }
 
     @PostMapping("/{couponAdminId}")
-    public ApiResponse<CouponCreateResponseDto> createAdminCoupons(
+    public ApiResponse<CouponCreateResponseDto> createAdminCoupon(
         @PathVariable Long couponAdminId,
         @RequestBody CouponCreateRequestDto couponCreateRequestDto
     ) {
