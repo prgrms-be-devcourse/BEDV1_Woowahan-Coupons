@@ -113,8 +113,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(
                 jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getCode())))
-            .andExpect(jsonPath("$.error.message",
-                containsString(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage())));
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage())));
     }
 
     @Test
@@ -145,8 +144,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code",
                 is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
-            .andExpect(jsonPath("$.error.message",
-                containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
     }
 
     @Test
@@ -191,8 +189,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_NOT_FOUND.getCode())))
-            .andExpect(jsonPath("$.error.message",
-                containsString(ErrorCode.COUPON_NOT_FOUND.getMessage())));
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_NOT_FOUND.getMessage())));
     }
 
     @Test
@@ -217,8 +214,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.CUSTOMER_NOT_FOUND.getCode())))
-            .andExpect(jsonPath("$.error.message",
-                containsString(ErrorCode.CUSTOMER_NOT_FOUND.getMessage())));
+            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.CUSTOMER_NOT_FOUND.getMessage())));
     }
 
     @Test
