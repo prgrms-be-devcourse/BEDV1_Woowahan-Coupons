@@ -8,5 +8,5 @@ public interface CouponRedemptionService {
 
     void allocateCouponToCustomerWithIssuance(Long couponId, Long customerId);
 
-    void issueCouponCode(Long couponId);
+    void issueCouponCodes(Long couponId, int issuanceCount);
 }
