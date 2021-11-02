@@ -142,8 +142,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(handler().methodName("registerCouponCode"))
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
-            .andExpect(jsonPath("$.error.code",
-                is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
             .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
     }
 
