@@ -1,7 +1,7 @@
 package com.coumin.woowahancoupons.coupon.service;
 
-import com.coumin.woowahancoupons.coupon.TestCouponFactory;
-import com.coumin.woowahancoupons.coupon.dto.CouponConverter;
+import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
+import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdmin;
@@ -19,20 +19,19 @@ class SimpleCouponServiceIntegrationTest {
 
     @Autowired
     CouponAdminRepository couponAdminRepository;
+
     @Autowired
     private CouponService couponService;
+
     @Autowired
     private CouponConverter couponConverter;
-
 
     @Test
     @DisplayName("관리자가 쿠폰 생성(발행) 성공")
     void generateCouponTest() {
         //Given
         CouponAdmin couponAdmin = new CouponAdmin("Admin_WOOCOU");
-
         Long couponAdminId = couponAdminRepository.save(couponAdmin).getId();
-
         CouponCreateRequestDto couponCreateRequestDto = couponConverter
             .convertToCouponCreateRequest(
                 TestCouponFactory.builder()
@@ -62,6 +61,5 @@ class SimpleCouponServiceIntegrationTest {
             soft.assertThat(couponCreateRequestDto.getIssuerType())
                 .isEqualTo(couponCreateResponseDto.getIssuerType());
         });
-
     }
 }
