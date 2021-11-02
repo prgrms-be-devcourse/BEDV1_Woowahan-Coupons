@@ -79,7 +79,7 @@ class CouponRestControllerTest {
     }
 
     @Test
-    @DisplayName("요청이 유효하지 않으면 매장의 쿠폰 생성 실패")
+    @DisplayName("매장의 쿠폰 생성 실패 - 생성 수량 초과 및 쿠폰의 값들 0")
     void createStoreCouponsInvalidRequestValueTest() throws Exception {
         //Given
         long storeId = storeRepository.save(new Store("testStore#1")).getId();
@@ -104,7 +104,7 @@ class CouponRestControllerTest {
     }
 
     @Test
-    @DisplayName("요청이 유효하지 않은 메서드라면 매장의 쿠폰 생성 실패")
+    @DisplayName("매장의 쿠폰 생성 실패 - post 대신 put 요청")
     void createStoreCouponsInvalidRequestMethodTest() throws Exception {
         //Given
         long storeId = storeRepository.save(new Store("testStore#1")).getId();
