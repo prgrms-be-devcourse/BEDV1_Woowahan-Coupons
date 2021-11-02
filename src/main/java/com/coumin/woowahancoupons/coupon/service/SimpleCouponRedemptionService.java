@@ -1,5 +1,7 @@
 package com.coumin.woowahancoupons.coupon.service;
 
+import com.coumin.woowahancoupons.coupon.converter.CouponRedemptionConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponRedemptionResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
@@ -9,7 +11,9 @@ import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +27,18 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
     private final CouponRepository couponRepository;
 
+    private final CouponRedemptionConverter couponRedemptionConverter;
+
     public SimpleCouponRedemptionService(
         CouponRedemptionRepository couponRedemptionRepository,
         CustomerRepository customerRepository,
-        CouponRepository couponRepository
+        CouponRepository couponRepository,
+        CouponRedemptionConverter couponRedemptionConverter
     ) {
         this.couponRedemptionRepository = couponRedemptionRepository;
         this.customerRepository = customerRepository;
         this.couponRepository = couponRepository;
+        this.couponRedemptionConverter = couponRedemptionConverter;
     }
 
     @Transactional
@@ -50,5 +58,12 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
         couponRedemptionRepository.save(CouponRedemption.of(coupon, customer));
+    }
+
+    @Override
+    public List<CouponRedemptionResponseDto> findCustomerCouponRedemptions(Long customerId) {
+        return couponRedemptionRepository.findByCustomerIdAndUsedFalse(customerId).stream()
+            .map(couponRedemptionConverter::convertToCouponRedemptionResponseDto)
+            .collect(Collectors.toList());
     }
 }

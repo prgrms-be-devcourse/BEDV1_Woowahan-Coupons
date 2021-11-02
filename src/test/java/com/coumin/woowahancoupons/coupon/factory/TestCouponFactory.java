@@ -1,4 +1,4 @@
-package com.coumin.woowahancoupons.coupon;
+package com.coumin.woowahancoupons.coupon.factory;
 
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.DiscountType;

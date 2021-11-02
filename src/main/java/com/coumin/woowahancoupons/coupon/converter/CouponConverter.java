@@ -1,5 +1,7 @@
-package com.coumin.woowahancoupons.coupon.dto;
+package com.coumin.woowahancoupons.coupon.converter;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
+import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.DiscountType;
 import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
