@@ -10,17 +10,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponIssuanceDto;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +46,9 @@ class CouponRedemptionRestControllerTest {
 
     @Autowired
     private CouponRedemptionService couponRedemptionService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Customer testCustomer;
 
@@ -199,5 +206,86 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.CUSTOMER_NOT_FOUND.getCode())))
             .andExpect(jsonPath("$.error.message", containsString(ErrorCode.CUSTOMER_NOT_FOUND.getMessage())));
+    }
+
+    @Test
+    @DisplayName("쿠폰 코드 발행 - 성공 테스트")
+    void issueCouponCodesSuccessTest() throws Exception {
+        //Given
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(3);
+        entityManager.persist(coupon);
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/issue",
+                coupon.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(couponIssuanceDto))
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("issueCouponCodes"))
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
+
+    @Test
+    @DisplayName("쿠폰 코드 발행 - 실패 테스트 (쿠폰 발행 상한을 넘는 발행 수로 쿠폰 코드 발행을 시도)")
+    void issueCouponCodesFailureTest() throws Exception {
+        //Given
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(11);
+        entityManager.persist(coupon);
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/issue",
+                coupon.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(couponIssuanceDto))
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("issueCouponCodes"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_MAX_COUNT_OVER.getCode())));
+    }
+
+    @DisplayName("쿠폰 코드 발행 - 실패 테스트 (발행 개수가 0 이하)")
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void issueCouponCodesFailureTest2(int issuanceCount) throws Exception {
+        //Given
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(issuanceCount);
+        entityManager.persist(coupon);
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/issue",
+                coupon.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(couponIssuanceDto))
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("issueCouponCodes"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())));
     }
 }
