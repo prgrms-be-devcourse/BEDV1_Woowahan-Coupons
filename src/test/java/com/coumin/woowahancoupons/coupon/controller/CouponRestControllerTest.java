@@ -9,11 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coumin.woowahancoupons.coupon.TestCouponFactory;
-import com.coumin.woowahancoupons.coupon.dto.CouponConverter;
+import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
+import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdmin;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdminRepository;
 import com.coumin.woowahancoupons.domain.store.Store;
@@ -132,7 +132,7 @@ class CouponRestControllerTest {
     }
 
     private ResultActions requestCreateStoreCoupons(long storeId,
-                                                    StoreCouponSaveRequestDto requestDto)
+        StoreCouponSaveRequestDto requestDto)
         throws Exception {
         return mvc.perform(post("/api/v1/coupons/{storeId}/issuance", storeId)
                 .contentType(MediaType.APPLICATION_JSON)

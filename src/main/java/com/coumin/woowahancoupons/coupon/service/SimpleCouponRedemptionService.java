@@ -8,12 +8,14 @@ import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
+import com.coumin.woowahancoupons.global.exception.CouponMaxCountOverException;
 import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,5 +67,20 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
         return couponRedemptionRepository.findByCustomerIdAndUsedFalse(customerId).stream()
             .map(couponRedemptionConverter::convertToCouponRedemptionResponseDto)
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public void issueCouponCodes(Long couponId, int issuanceCount) {
+        Coupon coupon = couponRepository.findByIdForUpdate(couponId)
+            .orElseThrow(() -> new CouponNotFoundException(couponId));
+        if (!coupon.canIssueCouponCodes(issuanceCount)) {
+            throw new CouponMaxCountOverException(coupon.getMaxCount(), coupon.getAllocatedCount(), issuanceCount);
+        }
+        List<CouponRedemption> couponRedemptions = IntStream.rangeClosed(1, issuanceCount)
+            .mapToObj(operand -> CouponRedemption.of(coupon))
+            .collect(Collectors.toList());
+        int insertSize = couponRedemptionRepository.saveAll(couponRedemptions).size();
+        coupon.increaseAllocatedCount(insertSize);
     }
 }

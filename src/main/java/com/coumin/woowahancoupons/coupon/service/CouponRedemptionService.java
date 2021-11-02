@@ -11,4 +11,6 @@ public interface CouponRedemptionService {
     void allocateCouponToCustomerWithIssuance(Long couponId, Long customerId);
 
     List<CouponRedemptionResponseDto> findCustomerCouponRedemptions(Long customerId);
+
+    void issueCouponCodes(Long couponId, int issuanceCount);
 }
