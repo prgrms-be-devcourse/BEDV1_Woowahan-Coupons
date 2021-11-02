@@ -59,7 +59,7 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
     @Transactional
     @Override
     public void issueCouponCodes(Long couponId, int issueCount) {
-        Coupon coupon = couponRepository.findById(couponId)
+        Coupon coupon = couponRepository.findByIdForUpdate(couponId)
             .orElseThrow(() -> new CouponNotFoundException(couponId));
         if (!coupon.canIssueCouponCodes(issueCount)) {
             throw new CouponMaxCountOverException(coupon.getMaxCount(), coupon.getAllocatedCount(), issueCount);

@@ -183,7 +183,7 @@ class SimpleCouponRedemptionServiceTest {
         Long couponId = 1L;
         Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount + 1).allocatedCount(0).build());
         ArrayList mockList = mock(ArrayList.class);
-        given(couponRepository.findById(couponId)).willReturn(Optional.of(spyCoupon));
+        given(couponRepository.findByIdForUpdate(couponId)).willReturn(Optional.of(spyCoupon));
         given(couponRedemptionRepository.saveAll(any())).willReturn(mockList);
         given(mockList.size()).willReturn(issuanceCount);
 
@@ -202,7 +202,7 @@ class SimpleCouponRedemptionServiceTest {
         //Given
         Long couponId = 1L;
         Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount - 1).allocatedCount(0).build());
-        given(couponRepository.findById(couponId)).willReturn(Optional.of(spyCoupon));
+        given(couponRepository.findByIdForUpdate(couponId)).willReturn(Optional.of(spyCoupon));
 
         //When Then
         assertThatThrownBy(() -> couponRedemptionService.issueCouponCodes(couponId, issuanceCount))
