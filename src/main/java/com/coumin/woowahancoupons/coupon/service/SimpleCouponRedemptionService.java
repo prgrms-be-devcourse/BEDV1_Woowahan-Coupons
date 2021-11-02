@@ -1,5 +1,7 @@
 package com.coumin.woowahancoupons.coupon.service;
 
+import com.coumin.woowahancoupons.coupon.converter.CouponRedemptionConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponRedemptionResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
@@ -27,14 +29,18 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
 
     private final CouponRepository couponRepository;
 
+    private final CouponRedemptionConverter couponRedemptionConverter;
+
     public SimpleCouponRedemptionService(
         CouponRedemptionRepository couponRedemptionRepository,
         CustomerRepository customerRepository,
-        CouponRepository couponRepository
+        CouponRepository couponRepository,
+        CouponRedemptionConverter couponRedemptionConverter
     ) {
         this.couponRedemptionRepository = couponRedemptionRepository;
         this.customerRepository = customerRepository;
         this.couponRepository = couponRepository;
+        this.couponRedemptionConverter = couponRedemptionConverter;
     }
 
     @Transactional
@@ -54,6 +60,13 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
         couponRedemptionRepository.save(CouponRedemption.of(coupon, customer));
+    }
+
+    @Override
+    public List<CouponRedemptionResponseDto> findCustomerCouponRedemptions(Long customerId) {
+        return couponRedemptionRepository.findByCustomerIdAndUsedFalse(customerId).stream()
+            .map(couponRedemptionConverter::convertToCouponRedemptionResponseDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional

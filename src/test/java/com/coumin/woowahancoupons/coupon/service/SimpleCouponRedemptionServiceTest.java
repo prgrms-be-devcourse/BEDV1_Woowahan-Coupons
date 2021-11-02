@@ -6,9 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
-import com.coumin.woowahancoupons.coupon.TestCouponFactory;
+import com.coumin.woowahancoupons.coupon.converter.CouponRedemptionConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponRedemptionResponseDto;
+import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
@@ -22,8 +26,11 @@ import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAlloca
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +52,9 @@ class SimpleCouponRedemptionServiceTest {
 
     @Mock
     private CustomerRepository customerRepository;
+
+    @Mock
+    private CouponRedemptionConverter couponRedemptionConverter;
 
     @InjectMocks
     private SimpleCouponRedemptionService couponRedemptionService;
@@ -80,7 +90,8 @@ class SimpleCouponRedemptionServiceTest {
     void allocateExistingCouponToCustomerFailureTest() {
         //Given
         UUID invalidCouponCode = UUID.randomUUID();
-        given(couponRedemptionRepository.findByCouponCode(invalidCouponCode)).willReturn(Optional.empty());
+        given(couponRedemptionRepository.findByCouponCode(invalidCouponCode))
+            .willReturn(Optional.empty());
 
         //When Then
         assertThatThrownBy(
@@ -123,7 +134,8 @@ class SimpleCouponRedemptionServiceTest {
         Long couponId = 1L;
         Customer mockCustomer = mock(Customer.class);
         Coupon spyCoupon = spy(TestCouponFactory.builder().build());
-        ArgumentCaptor<CouponRedemption> CouponRedemptionCaptor = ArgumentCaptor.forClass(CouponRedemption.class);
+        ArgumentCaptor<CouponRedemption> CouponRedemptionCaptor = ArgumentCaptor
+            .forClass(CouponRedemption.class);
 
         given(spyCoupon.getId()).willReturn(couponId);
         given(mockCustomer.getId()).willReturn(customerId);
@@ -173,6 +185,32 @@ class SimpleCouponRedemptionServiceTest {
             invalidCustomerId))
             .isInstanceOf(CustomerNotFoundException.class)
             .hasMessageContaining(ErrorCode.CUSTOMER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("고객의 사용가능한 쿠폰 리뎀션 리스트 조회")
+    void findCustomerCouponRedemptionsTest() {
+        //Given
+        Long customerId = 1L;
+        Customer mockCustomer = mock(Customer.class);
+        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        List<CouponRedemption> couponRedemptions = LongStream.range(0, 5)
+            .mapToObj(seq -> CouponRedemption.of(spyCoupon, mockCustomer))
+            .collect(Collectors.toList());
+
+        given(couponRedemptionRepository.findByCustomerIdAndUsedFalse(customerId))
+            .willReturn(couponRedemptions);
+        given(couponRedemptionConverter.convertToCouponRedemptionResponseDto(
+            any(CouponRedemption.class)
+        )).willReturn(mock(CouponRedemptionResponseDto.class));
+
+        //When
+        List<CouponRedemptionResponseDto> couponRedemptionResponseDtoList = couponRedemptionService
+            .findCustomerCouponRedemptions(customerId);
+
+        //Then
+        assertThat(couponRedemptionResponseDtoList).hasSize(5);
+        verify(couponRedemptionRepository, only()).findByCustomerIdAndUsedFalse(customerId);
     }
 
     @DisplayName("쿠폰 코드 발행 - 성공 테스트")

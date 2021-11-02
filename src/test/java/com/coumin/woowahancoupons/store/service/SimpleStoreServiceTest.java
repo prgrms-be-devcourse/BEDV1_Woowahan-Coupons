@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 
-import com.coumin.woowahancoupons.coupon.TestCouponFactory;
+import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
