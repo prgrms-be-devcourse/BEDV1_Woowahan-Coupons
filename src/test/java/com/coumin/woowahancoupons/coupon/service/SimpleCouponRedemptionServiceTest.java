@@ -16,15 +16,19 @@ import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
+import com.coumin.woowahancoupons.global.exception.CouponMaxCountOverException;
 import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -169,5 +173,39 @@ class SimpleCouponRedemptionServiceTest {
             invalidCustomerId))
             .isInstanceOf(CustomerNotFoundException.class)
             .hasMessageContaining(ErrorCode.CUSTOMER_NOT_FOUND.getMessage());
+    }
+
+    @DisplayName("쿠폰 코드 발행 - 성공 테스트")
+    @ParameterizedTest
+    @ValueSource(ints = {1, 10, 100})
+    void issueCouponCodesSuccessTest(int issuanceCount) {
+        //Given
+        Long couponId = 1L;
+        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount + 1).allocatedCount(0).build());
+        ArrayList mockList = mock(ArrayList.class);
+        given(couponRepository.findById(couponId)).willReturn(Optional.of(spyCoupon));
+        given(couponRedemptionRepository.saveAll(any())).willReturn(mockList);
+        given(mockList.size()).willReturn(issuanceCount);
+
+        //When
+        assertThat(spyCoupon.getAllocatedCount()).isZero();
+        couponRedemptionService.issueCouponCodes(couponId, issuanceCount);
+
+        //Then
+        assertThat(spyCoupon.getAllocatedCount()).isEqualTo(issuanceCount);
+    }
+
+    @DisplayName("쿠폰 코드 발행 - 실패 테스트 (쿠폰 발행 상한을 넘는 발행 수로 쿠폰 코드 발행을 시도)")
+    @ParameterizedTest
+    @ValueSource(ints = {10, 100})
+    void issueCouponCodesFailureTest(int issuanceCount) {
+        //Given
+        Long couponId = 1L;
+        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount - 1).allocatedCount(0).build());
+        given(couponRepository.findById(couponId)).willReturn(Optional.of(spyCoupon));
+
+        //When Then
+        assertThatThrownBy(() -> couponRedemptionService.issueCouponCodes(couponId, issuanceCount))
+            .isInstanceOf(CouponMaxCountOverException.class);
     }
 }
