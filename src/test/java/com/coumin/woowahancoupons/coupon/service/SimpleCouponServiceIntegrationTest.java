@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 class SimpleCouponServiceIntegrationTest {
 
     @Autowired
-    CouponAdminRepository couponAdminRepository;
+    private CouponAdminRepository couponAdminRepository;
 
     @Autowired
     private CouponService couponService;
