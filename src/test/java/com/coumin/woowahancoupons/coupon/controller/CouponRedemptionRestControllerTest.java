@@ -1,8 +1,11 @@
 package com.coumin.woowahancoupons.coupon.controller;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -19,6 +22,7 @@ import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
+import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -107,8 +111,10 @@ class CouponRedemptionRestControllerTest {
             .andExpect(handler().methodName("registerCouponCode"))
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
-            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getCode())))
-            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage())));
+            .andExpect(
+                jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getCode())))
+            .andExpect(jsonPath("$.error.message",
+                containsString(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage())));
     }
 
     @Test
@@ -117,7 +123,10 @@ class CouponRedemptionRestControllerTest {
         //Given
         CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
         entityManager.persist(couponRedemption);
-        couponRedemptionService.allocateExistingCouponToCustomer(couponRedemption.getCouponCode(), testCustomer.getId());
+        couponRedemptionService.allocateExistingCouponToCustomer(
+            couponRedemption.getCouponCode(),
+            testCustomer.getId()
+        );
 
         //When
         ResultActions result = mockMvc.perform(
@@ -134,8 +143,10 @@ class CouponRedemptionRestControllerTest {
             .andExpect(handler().methodName("registerCouponCode"))
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
-            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
-            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
+            .andExpect(jsonPath("$.error.code",
+                is(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getCode())))
+            .andExpect(jsonPath("$.error.message",
+                containsString(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage())));
     }
 
     @Test
@@ -180,7 +191,8 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_NOT_FOUND.getCode())))
-            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_NOT_FOUND.getMessage())));
+            .andExpect(jsonPath("$.error.message",
+                containsString(ErrorCode.COUPON_NOT_FOUND.getMessage())));
     }
 
     @Test
@@ -205,7 +217,8 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.CUSTOMER_NOT_FOUND.getCode())))
-            .andExpect(jsonPath("$.error.message", containsString(ErrorCode.CUSTOMER_NOT_FOUND.getMessage())));
+            .andExpect(jsonPath("$.error.message",
+                containsString(ErrorCode.CUSTOMER_NOT_FOUND.getMessage())));
     }
 
     @Test
@@ -287,5 +300,40 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
             .andExpect(jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())));
+    }
+
+    @Test
+    @DisplayName("고객의 사용가능한 쿠폰리스트 조회")
+    void getCustomerCouponRedemptionsTest() throws Exception {
+
+        //Given
+        Long customerId = testCustomer.getId();
+        IntStream.range(0, 5)
+            .mapToObj(i -> CouponRedemption.of(testCoupon, testCustomer))
+            .forEach(couponRedemption -> entityManager.persist(couponRedemption));
+
+        //When
+        ResultActions result = mockMvc.perform(get("/api/v1/coupons/{customerId}", customerId)
+            .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("getCustomerCouponRedemptions"))
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data", hasSize(5)))
+            .andExpect(jsonPath("$.data[0].id", is(notNullValue())))
+            .andExpect(jsonPath("$.data[0].couponCode", is(notNullValue())))
+            .andExpect(jsonPath("$.data[0].startAt", is(notNullValue())))
+            .andExpect(jsonPath("$.data[0].expiredAt", is(notNullValue())))
+            .andExpect(jsonPath("$.data[0].coupon", is(notNullValue())))
+            .andExpect(jsonPath("$.data[0].coupon.name", is("test coupon")))
+            .andExpect(jsonPath("$.data[0].coupon.amount", is(1000)))
+            .andExpect(jsonPath("$.data[0].coupon.minOrderPrice", is(nullValue())))
+            .andExpect(jsonPath("$.data[0].coupon.discountType", is("FIXED_AMOUNT")))
+            .andExpect(jsonPath("$.data[0].coupon.issuerType", is("ADMIN")))
+            .andExpect(jsonPath("$.error", is(nullValue())));
     }
 }
