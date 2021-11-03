@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class CouponCreateRequestDto {
 
     @Size(min = 1, max = 100)
+    @NotNull
     private String name;
 
     @Max(10_000)
