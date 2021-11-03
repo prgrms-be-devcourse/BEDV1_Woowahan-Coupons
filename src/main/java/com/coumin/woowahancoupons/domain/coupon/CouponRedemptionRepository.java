@@ -13,4 +13,6 @@ public interface CouponRedemptionRepository extends JpaRepository<CouponRedempti
 
     @EntityGraph(attributePaths = {"coupon"}, type = EntityGraphType.LOAD)
     List<CouponRedemption> findByCustomerIdAndUsedFalse(Long customerId);
+
+    int countByCouponIdAndCustomerId(Long couponId, Long customerId);
 }

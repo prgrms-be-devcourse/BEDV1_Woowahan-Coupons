@@ -116,4 +116,8 @@ public class Coupon extends BaseEntity {
     public boolean isNotAdminCoupon() {
         return issuerType != IssuerType.ADMIN;
     }
+
+    public boolean canIssueCouponCodeToCustomer(int customerCouponCount) {
+        return maxCountPerCustomer == null || maxCountPerCustomer > customerCouponCount;
+    }
 }
