@@ -18,9 +18,11 @@ import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
+import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
@@ -322,6 +324,81 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
+    @Test
+    @DisplayName("쿠폰 사용 - 성공 테스트")
+    void userCouponRedemptionTest() throws Exception {
+        //Given
+        CouponRedemption couponRedemption = givenCouponRedemptionWithCustomer();
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponRedemptionId}/use",
+                couponRedemption.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("userCouponRedemption"))
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
+
+    @Test
+    @DisplayName("쿠폰 사용 - 실패 테스트 (이미 사용된 쿠폰)")
+    void userCouponRedemptionFailureTest() throws Exception {
+        //Given
+        CouponRedemption couponRedemption = givenCouponRedemptionWithCustomer();
+        couponRedemption.use();
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponRedemptionId}/use",
+                couponRedemption.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("userCouponRedemption"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_ALREADY_USE.getCode())));
+    }
+
+    @Test
+    @DisplayName("쿠폰 사용 - 실패 테스트 (쿠폰의 사용 기한 만료)")
+    void userCouponRedemptionFailureTest2() throws Exception {
+        //Given
+        Coupon coupon = TestCouponFactory.builder()
+            .expirationPolicy(ExpirationPolicy.newByPeriod(
+                LocalDateTime.of(2000, 12, 31, 23, 59, 59),
+                LocalDateTime.of(2001, 12, 31, 23, 59, 59)
+            )).build();
+        CouponRedemption couponRedemption = givenCouponRedemptionWithCustomer(coupon);
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponRedemptionId}/use",
+                couponRedemption.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("userCouponRedemption"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_EXPIRE.getCode())));
+    }
+
     private Coupon givenCoupon() {
         Coupon coupon = TestCouponFactory.builder().build();
         entityManager.persist(coupon);
@@ -336,6 +413,19 @@ class CouponRedemptionRestControllerTest {
 
     private CouponRedemption givenCouponRedemptionWithCustomer() {
         Coupon coupon = TestCouponFactory.builder().build();
+        Customer customer = new Customer("test@gmail.com");
+        CouponRedemption couponRedemption = CouponRedemption.of(coupon, customer);
+        entityManager.persist(coupon);
+        entityManager.persist(customer);
+        entityManager.persist(couponRedemption);
+        return couponRedemption;
+    }
+
+    private CouponRedemption givenCouponRedemptionWithCustomer(Coupon coupon) {
+        if(coupon == null) {
+            return givenCouponRedemptionWithCustomer();
+        }
+
         Customer customer = new Customer("test@gmail.com");
         CouponRedemption couponRedemption = CouponRedemption.of(coupon, customer);
         entityManager.persist(coupon);
