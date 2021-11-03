@@ -268,13 +268,13 @@ class SimpleCouponRedemptionServiceTest {
         //Given
         try(MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
             Long couponRedemptionId = 1L;
-            LocalDateTime mockNow = LocalDateTime.of(2021, 11, 3, 17, 45, 30);
+            LocalDateTime expectedUsedTime = LocalDateTime.of(2021, 11, 3, 17, 45, 30);
             Coupon spyCoupon = spy(TestCouponFactory.builder().build());
             Customer mockCustomer = mock(Customer.class);
             CouponRedemption spyCouponRedemption = spy(
                 CouponRedemption.of(spyCoupon, mockCustomer));
 
-            localDateTimeMockedStatic.when(LocalDateTime::now).thenReturn(mockNow);
+            localDateTimeMockedStatic.when(LocalDateTime::now).thenReturn(expectedUsedTime);
             given(couponRedemptionRepository.findById(couponRedemptionId))
                 .willReturn(Optional.of(spyCouponRedemption));
 
@@ -287,7 +287,7 @@ class SimpleCouponRedemptionServiceTest {
             SoftAssertions.assertSoftly(softAssertions -> {
                     softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(true);
                     softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isAfter(LocalDateTime.of(2021, 11, 3, 17, 45, 29));
-                    softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isEqualTo(mockNow);
+                    softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isEqualTo(expectedUsedTime);
                     softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isBefore(LocalDateTime.of(2021, 11, 3, 17, 45, 31));
                 }
             );
