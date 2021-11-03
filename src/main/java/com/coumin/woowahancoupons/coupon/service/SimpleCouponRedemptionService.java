@@ -75,12 +75,21 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
         Coupon coupon = couponRepository.findByIdForUpdate(couponId)
             .orElseThrow(() -> new CouponNotFoundException(couponId));
         if (!coupon.canIssueCouponCodes(issuanceCount)) {
-            throw new CouponMaxCountOverException(coupon.getMaxCount(), coupon.getAllocatedCount(), issuanceCount);
+            throw new CouponMaxCountOverException(coupon.getMaxCount(), coupon.getAllocatedCount(),
+                issuanceCount);
         }
         List<CouponRedemption> couponRedemptions = IntStream.rangeClosed(1, issuanceCount)
             .mapToObj(operand -> CouponRedemption.of(coupon))
             .collect(Collectors.toList());
         int insertSize = couponRedemptionRepository.saveAll(couponRedemptions).size();
         coupon.increaseAllocatedCount(insertSize);
+    }
+
+    @Transactional
+    @Override
+    public void useCustomerCoupon(Long couponRedemptionId) {
+        CouponRedemption couponRedemption = couponRedemptionRepository.findById(couponRedemptionId)
+            .orElseThrow(() -> new CouponRedemptionNotFoundException(couponRedemptionId));
+        couponRedemption.use();
     }
 }
