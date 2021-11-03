@@ -271,6 +271,7 @@ class SimpleCouponRedemptionServiceTest {
         couponRedemptionService.useCustomerCoupon(couponRedemptionId);
 
         //Then
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
         verify(spyCouponRedemption, times(1)).use();
         SoftAssertions.assertSoftly(softAssertions -> {
                 softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(true);
@@ -295,6 +296,7 @@ class SimpleCouponRedemptionServiceTest {
             .isInstanceOf(CouponRedemptionNotFoundException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
 
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
         verify(spyCouponRedemption, never()).use();
         SoftAssertions.assertSoftly(softAssertions -> {
                 softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(false);
@@ -346,7 +348,7 @@ class SimpleCouponRedemptionServiceTest {
             .isInstanceOf(CouponRedemptionExpireException.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_EXPIRE.getMessage());
 
-        verify(couponRedemptionRepository, only()).findById(couponRedemptionId);
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
         verify(spyCouponRedemption, times(1)).use();
         SoftAssertions.assertSoftly(softAssertions -> {
                 softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(false);
