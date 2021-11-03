@@ -131,15 +131,6 @@ class CouponRestControllerTest {
             .andDo(print());
     }
 
-    private ResultActions requestCreateStoreCoupons(long storeId,
-        StoreCouponSaveRequestDto requestDto)
-        throws Exception {
-        return mvc.perform(post("/api/v1/coupons/{storeId}/issuance", storeId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
-            .andDo(print());
-    }
-
     @Test
     @DisplayName("관리자가 쿠폰을 발행 할 수 있다.")
     void createAdminCouponTest() throws Exception {
@@ -179,6 +170,15 @@ class CouponRestControllerTest {
             .andExpect(jsonPath("$.data.allocatedCount", is(10)))
             .andExpect(jsonPath("$.data.promotionCode", is("프로모션코드")));
 
+    }
+
+    private ResultActions requestCreateStoreCoupons(long storeId,
+        StoreCouponSaveRequestDto requestDto)
+        throws Exception {
+        return mvc.perform(post("/api/v1/coupons/{storeId}/issuance", storeId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestDto)))
+            .andDo(print());
     }
 }
 
