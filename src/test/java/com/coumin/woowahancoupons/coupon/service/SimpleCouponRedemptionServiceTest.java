@@ -5,9 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.coumin.woowahancoupons.coupon.converter.CouponRedemptionConverter;
@@ -20,17 +23,21 @@ import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
+import com.coumin.woowahancoupons.global.exception.CouponAlreadyUseException;
 import com.coumin.woowahancoupons.global.exception.CouponMaxCountOverException;
 import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
+import com.coumin.woowahancoupons.global.exception.CouponRedemptionExpireException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,18 +116,19 @@ class SimpleCouponRedemptionServiceTest {
         Coupon coupon = TestCouponFactory.builder().build();
         CouponRedemption couponRedemption = CouponRedemption.of(coupon);
 
-        given(couponRedemptionRepository.findByCouponCode(couponRedemption.getCouponCode()))
+        UUID couponCode = couponRedemption.getCouponCode();
+        given(couponRedemptionRepository.findByCouponCode(couponCode))
             .willReturn(Optional.of(couponRedemption));
         given(customerRepository.getById(customerId)).willReturn(mockCustomer);
 
         couponRedemptionService.allocateExistingCouponToCustomer(
-            couponRedemption.getCouponCode(),
+            couponCode,
             customerId
         );
 
         //When Then
         assertThatThrownBy(() -> couponRedemptionService.allocateExistingCouponToCustomer(
-            couponRedemption.getCouponCode(),
+            couponCode,
             customerId))
             .isInstanceOf(CouponRedemptionAlreadyAllocateCustomer.class)
             .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_ALREADY_ALLOCATE.getMessage());
@@ -174,6 +182,7 @@ class SimpleCouponRedemptionServiceTest {
     void allocateCouponToCustomerWithIssuanceFailureTest2() {
         //Given
         Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        Long couponId = spyCoupon.getId();
         Long invalidCustomerId = 1L;
 
         given(couponRepository.findById(any())).willReturn(Optional.of(spyCoupon));
@@ -181,7 +190,7 @@ class SimpleCouponRedemptionServiceTest {
 
         //When Then
         assertThatThrownBy(() -> couponRedemptionService.allocateCouponToCustomerWithIssuance(
-            spyCoupon.getId(),
+            couponId,
             invalidCustomerId))
             .isInstanceOf(CustomerNotFoundException.class)
             .hasMessageContaining(ErrorCode.CUSTOMER_NOT_FOUND.getMessage());
@@ -245,5 +254,104 @@ class SimpleCouponRedemptionServiceTest {
         //When Then
         assertThatThrownBy(() -> couponRedemptionService.issueCouponCodes(couponId, issuanceCount))
             .isInstanceOf(CouponMaxCountOverException.class);
+    }
+
+    @Test
+    @DisplayName("사용자의 쿠폰 사용 - 성공 테스트")
+    void useCustomerCouponSuccessTest() {
+        //Given
+        Long couponRedemptionId = 1L;
+        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        Customer mockCustomer = mock(Customer.class);
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mockCustomer));
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+
+        //When
+        couponRedemptionService.useCustomerCoupon(couponRedemptionId);
+
+        //Then
+        verify(spyCouponRedemption, times(1)).use();
+        SoftAssertions.assertSoftly(softAssertions -> {
+                softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(true);
+                softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isBefore(LocalDateTime.now());
+            }
+        );
+    }
+
+    @Test
+    @DisplayName("사용자의 쿠폰 사용 - 실패 테스트(존재하지 않는 쿠폰)")
+    void useCustomerCouponFailureTest() {
+        //Given
+        Long couponRedemptionId = 1L;
+        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        Customer mockCustomer = mock(Customer.class);
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mockCustomer));
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.empty());
+
+        //When, Then
+        assertThatThrownBy(() -> couponRedemptionService.useCustomerCoupon(couponRedemptionId))
+            .isInstanceOf(CouponRedemptionNotFoundException.class)
+            .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage());
+
+        verify(spyCouponRedemption, never()).use();
+        SoftAssertions.assertSoftly(softAssertions -> {
+                softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(false);
+                softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isNull();
+            }
+        );
+    }
+
+    @Test
+    @DisplayName("사용자의 쿠폰 사용 - 실패 테스트(이미 사용한 쿠폰)")
+    void useCustomerCouponFailureTest2() {
+        //Given
+        Long couponRedemptionId = 1L;
+        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        Customer mockCustomer = mock(Customer.class);
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mockCustomer));
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        willThrow(new CouponAlreadyUseException()).given(spyCouponRedemption).use();
+
+        //When, Then
+        assertThatThrownBy(() -> couponRedemptionService.useCustomerCoupon(couponRedemptionId))
+            .isInstanceOf(CouponAlreadyUseException.class)
+            .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_ALREADY_USE.getMessage());
+
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
+        verify(spyCouponRedemption, times(1)).use();
+        SoftAssertions.assertSoftly(softAssertions -> {
+                softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(false);
+                softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isNull();
+            }
+        );
+    }
+
+    @Test
+    @DisplayName("사용자의 쿠폰 사용 - 실패 테스트(사용 기한이 만료된 쿠폰)")
+    void useCustomerCouponFailureTest3() {
+        //Given
+        Long couponRedemptionId = 1L;
+        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+        Customer mockCustomer = mock(Customer.class);
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mockCustomer));
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        willThrow(new CouponRedemptionExpireException()).given(spyCouponRedemption).use();
+
+        //When, Then
+        assertThatThrownBy(() -> couponRedemptionService.useCustomerCoupon(couponRedemptionId))
+            .isInstanceOf(CouponRedemptionExpireException.class)
+            .hasMessageContaining(ErrorCode.COUPON_REDEMPTION_EXPIRE.getMessage());
+
+        verify(couponRedemptionRepository, only()).findById(couponRedemptionId);
+        verify(spyCouponRedemption, times(1)).use();
+        SoftAssertions.assertSoftly(softAssertions -> {
+                softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(false);
+                softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isNull();
+            }
+        );
     }
 }
