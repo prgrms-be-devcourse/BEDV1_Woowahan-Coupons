@@ -52,6 +52,7 @@ public class CouponCreateRequestDto {
 
     private LocalDateTime startAt;
 
+    @FutureOrPresent(message = "expiration date must be future or present.")
     private LocalDateTime expiredAt;
 
     @Max(365)
