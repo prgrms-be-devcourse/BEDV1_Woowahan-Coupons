@@ -208,7 +208,7 @@ class CouponRedemptionRestControllerTest {
     @DisplayName("쿠폰 코드 발행 - 성공 테스트")
     void issueCouponCodesSuccessTest() throws Exception {
         //Given
-        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).build();
         CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(3);
         entityManager.persist(coupon);
 
@@ -234,7 +234,7 @@ class CouponRedemptionRestControllerTest {
     @DisplayName("쿠폰 코드 발행 - 실패 테스트 (쿠폰 발행 상한을 넘는 발행 수로 쿠폰 코드 발행을 시도)")
     void issueCouponCodesFailureTest() throws Exception {
         //Given
-        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).build();
         CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(11);
         entityManager.persist(coupon);
 
@@ -262,7 +262,7 @@ class CouponRedemptionRestControllerTest {
     @ValueSource(ints = {0, -1})
     void issueCouponCodesFailureTest2(int issuanceCount) throws Exception {
         //Given
-        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).build();
         CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(issuanceCount);
         entityManager.persist(coupon);
 

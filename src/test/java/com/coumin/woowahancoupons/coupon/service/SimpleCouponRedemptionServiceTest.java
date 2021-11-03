@@ -219,7 +219,7 @@ class SimpleCouponRedemptionServiceTest {
     void issueCouponCodesSuccessTest(int issuanceCount) {
         //Given
         Long couponId = 1L;
-        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount + 1).allocatedCount(0).build());
+        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount + 1).build());
         ArrayList mockList = mock(ArrayList.class);
         given(couponRepository.findByIdForUpdate(couponId)).willReturn(Optional.of(spyCoupon));
         given(couponRedemptionRepository.saveAll(any())).willReturn(mockList);
@@ -239,7 +239,7 @@ class SimpleCouponRedemptionServiceTest {
     void issueCouponCodesFailureTest(int issuanceCount) {
         //Given
         Long couponId = 1L;
-        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount - 1).allocatedCount(0).build());
+        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount - 1).build());
         given(couponRepository.findByIdForUpdate(couponId)).willReturn(Optional.of(spyCoupon));
 
         //When Then
