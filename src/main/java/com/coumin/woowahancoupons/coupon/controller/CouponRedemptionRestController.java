@@ -54,4 +54,11 @@ public class CouponRedemptionRestController {
         couponRedemptionService.issueCouponCodes(couponId, couponIssuanceDto.getIssuanceCount());
         return ApiResponse.success();
     }
+
+    @PostMapping("/{couponRedemptionId}/use")
+    public ApiResponse<Object> userCouponRedemption(@PathVariable("couponRedemptionId") Long couponRedemptionId
+    ) {
+        couponRedemptionService.useCustomerCoupon(couponRedemptionId);
+        return ApiResponse.success();
+    }
 }
