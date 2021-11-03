@@ -180,5 +180,6 @@ class CouponRestControllerTest {
             .content(objectMapper.writeValueAsString(requestDto)))
             .andDo(print());
     }
+
 }
 
