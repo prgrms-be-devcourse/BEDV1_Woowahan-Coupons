@@ -1,6 +1,13 @@
 package com.coumin.woowahancoupons.coupon.dto;
 
 import java.time.LocalDateTime;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,32 +16,50 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CouponCreateRequestDto {
 
+    @Size(min = 1, max = 100)
     private String name;
 
+    @Max(10_000)
+    @Min(1000)
     private Long amount;
 
+    @Max(100_000)
+    @PositiveOrZero
     private Long minOrderPrice;
 
+    @NotEmpty
     private String discountType;
 
+    @NotEmpty
     private String issuerType;
 
+    @NotNull
     private Long issuerId;
 
+    @Max(10_000)
+    @Min(1)
     private Integer maxCount;
 
+    @Max(10_000)
+    @Min(0)
     private Integer allocatedCount;
 
+    @Max(5)
+    @Min(0)
     private Integer maxCountPerCustomer;
 
     private String promotionCode;
 
+    @NotEmpty
     private String expirationPolicyType;
 
     private LocalDateTime startAt;
 
+    @FutureOrPresent(message = "creation date must be future or present.")
     private LocalDateTime expiredAt;
 
+    @Max(365)
+    @Min(0)
     private Integer daysFromIssuance;
 
     public CouponCreateRequestDto(
