@@ -31,7 +31,7 @@ public class CouponCreateRequestDto {
     @NotBlank
     private String discountType;
 
-    @NotEmpty
+    @NotBlank
     private String issuerType;
 
     @NotNull
