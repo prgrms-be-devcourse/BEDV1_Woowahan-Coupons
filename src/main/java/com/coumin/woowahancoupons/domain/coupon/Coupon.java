@@ -4,6 +4,7 @@ import com.coumin.woowahancoupons.domain.BaseEntity;
 import lombok.*;
 import javax.persistence.*;
 import java.util.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.util.Assert;
 
 @Getter
@@ -43,8 +44,9 @@ public class Coupon extends BaseEntity {
     @Column(name = "max_cnt")
     private Integer maxCount;
 
-    @Column(name = "allocated_cnt")
-    private Integer allocatedCount;
+    @Column(name = "allocated_cnt", nullable = false)
+    @ColumnDefault("0")
+    private int allocatedCount;
 
     @Column(name = "max_cnt_per_cus")
     private Integer maxCountPerCustomer;
@@ -59,7 +61,7 @@ public class Coupon extends BaseEntity {
     private Coupon(
         Long id, String name, Long amount, ExpirationPolicy expirationPolicy, Long minOrderPrice,
         DiscountType discountType, IssuerType issuerType, Long issuerId, Integer maxCount,
-        Integer allocatedCount, Integer maxCountPerCustomer, String promotionCode
+        int allocatedCount, Integer maxCountPerCustomer, String promotionCode
     ) {
         this.id = id;
         this.name = name;

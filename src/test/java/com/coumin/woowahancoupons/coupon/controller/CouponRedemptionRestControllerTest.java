@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,30 +53,18 @@ class CouponRedemptionRestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Customer testCustomer;
-
-    private Coupon testCoupon;
-
-    @BeforeEach
-    public void beforeEach() {
-        testCustomer = new Customer("test@gmail.com");
-        testCoupon = TestCouponFactory.builder().build();
-        entityManager.persist(testCustomer);
-        entityManager.persist(testCoupon);
-    }
-
     @Test
     @DisplayName("고객이 쿠폰 번호를 입력해 쿠폰 등록 - 성공 테스트")
     void registerCouponCodeSuccessTest() throws Exception {
         //Given
-        CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
-        entityManager.persist(couponRedemption);
+        Customer givenCustomer = givenCustomer();
+        CouponRedemption givenCouponRedemption = givenCouponRedemptionWithoutCustomer();
 
         //When
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
-                couponRedemption.getCouponCode(),
-                testCustomer.getId())
+                givenCouponRedemption.getCouponCode(),
+                givenCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
 
@@ -95,12 +82,13 @@ class CouponRedemptionRestControllerTest {
     void registerCouponCodeFailureTest() throws Exception {
         //Given
         UUID invalidCouponCode = UUID.randomUUID();
+        Customer givenCustomer = givenCustomer();
 
         //When
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
                 invalidCouponCode,
-                testCustomer.getId())
+                givenCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
 
@@ -111,8 +99,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(handler().methodName("registerCouponCode"))
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data", is(nullValue())))
-            .andExpect(
-                jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getCode())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getCode())))
             .andExpect(jsonPath("$.error.message", containsString(ErrorCode.COUPON_REDEMPTION_NOT_FOUND.getMessage())));
     }
 
@@ -120,18 +107,13 @@ class CouponRedemptionRestControllerTest {
     @DisplayName("고객이 쿠폰 코드를 입력해 쿠폰 등록 - 실패 테스트 (이미 등록된 쿠폰)")
     void registerCouponCodeFailureTest2() throws Exception {
         //Given
-        CouponRedemption couponRedemption = CouponRedemption.of(testCoupon);
-        entityManager.persist(couponRedemption);
-        couponRedemptionService.allocateExistingCouponToCustomer(
-            couponRedemption.getCouponCode(),
-            testCustomer.getId()
-        );
+        CouponRedemption givenCouponRedemption = givenCouponRedemptionWithCustomer();
 
         //When
         ResultActions result = mockMvc.perform(
             patch("/api/v1/coupons/{couponCode}/customers/{customerId}/register",
-                couponRedemption.getCouponCode(),
-                testCustomer.getId())
+                givenCouponRedemption.getCouponCode(),
+                givenCouponRedemption.getCustomer().getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
 
@@ -149,11 +131,15 @@ class CouponRedemptionRestControllerTest {
     @Test
     @DisplayName("고객에게 쿠폰 자동 할당 - 성공 테스트")
     void allocateCouponSuccessTest() throws Exception {
+        //Given
+        Coupon givenCoupon = givenCoupon();
+        Customer givenCustomer = givenCustomer();
+
         //When
         ResultActions result = mockMvc.perform(
             post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
-                testCoupon.getId(),
-                testCustomer.getId())
+                givenCoupon.getId(),
+                givenCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
 
@@ -171,12 +157,13 @@ class CouponRedemptionRestControllerTest {
     void allocateCouponFailureTest() throws Exception {
         //Given
         Long invalidCouponId = 0L;
+        Customer givenCustomer = givenCustomer();
 
         //When
         ResultActions result = mockMvc.perform(
             post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
                 invalidCouponId,
-                testCustomer.getId())
+                givenCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         );
 
@@ -195,12 +182,13 @@ class CouponRedemptionRestControllerTest {
     @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (잘못된 고객 Id)")
     void allocateCouponFailureTest2() throws Exception {
         //Given
+        Coupon givenCoupon = givenCoupon();
         Long invalidCustomerId = 0L;
 
         //When
         ResultActions result = mockMvc.perform(
             post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
-                testCoupon.getId(),
+                givenCoupon.getId(),
                 invalidCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
         );
@@ -220,7 +208,7 @@ class CouponRedemptionRestControllerTest {
     @DisplayName("쿠폰 코드 발행 - 성공 테스트")
     void issueCouponCodesSuccessTest() throws Exception {
         //Given
-        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).build();
         CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(3);
         entityManager.persist(coupon);
 
@@ -246,7 +234,7 @@ class CouponRedemptionRestControllerTest {
     @DisplayName("쿠폰 코드 발행 - 실패 테스트 (쿠폰 발행 상한을 넘는 발행 수로 쿠폰 코드 발행을 시도)")
     void issueCouponCodesFailureTest() throws Exception {
         //Given
-        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).build();
         CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(11);
         entityManager.persist(coupon);
 
@@ -274,7 +262,7 @@ class CouponRedemptionRestControllerTest {
     @ValueSource(ints = {0, -1})
     void issueCouponCodesFailureTest2(int issuanceCount) throws Exception {
         //Given
-        Coupon coupon = TestCouponFactory.builder().maxCount(10).allocatedCount(0).build();
+        Coupon coupon = TestCouponFactory.builder().maxCount(10).build();
         CouponIssuanceDto couponIssuanceDto = new CouponIssuanceDto(issuanceCount);
         entityManager.persist(coupon);
 
@@ -302,9 +290,11 @@ class CouponRedemptionRestControllerTest {
     void getCustomerCouponRedemptionsTest() throws Exception {
 
         //Given
-        Long customerId = testCustomer.getId();
+        Coupon givenCoupon = givenCoupon();
+        Customer givenCustomer = givenCustomer();
+        Long customerId = givenCustomer.getId();
         IntStream.range(0, 5)
-            .mapToObj(i -> CouponRedemption.of(testCoupon, testCustomer))
+            .mapToObj(i -> CouponRedemption.of(givenCoupon, givenCustomer))
             .forEach(couponRedemption -> entityManager.persist(couponRedemption));
 
         //When
@@ -330,5 +320,35 @@ class CouponRedemptionRestControllerTest {
             .andExpect(jsonPath("$.data[0].coupon.discountType", is("FIXED_AMOUNT")))
             .andExpect(jsonPath("$.data[0].coupon.issuerType", is("ADMIN")))
             .andExpect(jsonPath("$.error", is(nullValue())));
+    }
+
+    private Coupon givenCoupon() {
+        Coupon coupon = TestCouponFactory.builder().build();
+        entityManager.persist(coupon);
+        return coupon;
+    }
+
+    private Customer givenCustomer() {
+        Customer customer = new Customer("test@gmail.com");
+        entityManager.persist(customer);
+        return customer;
+    }
+
+    private CouponRedemption givenCouponRedemptionWithCustomer() {
+        Coupon coupon = TestCouponFactory.builder().build();
+        Customer customer = new Customer("test@gmail.com");
+        CouponRedemption couponRedemption = CouponRedemption.of(coupon, customer);
+        entityManager.persist(coupon);
+        entityManager.persist(customer);
+        entityManager.persist(couponRedemption);
+        return couponRedemption;
+    }
+
+    private CouponRedemption givenCouponRedemptionWithoutCustomer() {
+        Coupon coupon = TestCouponFactory.builder().build();
+        CouponRedemption couponRedemption = CouponRedemption.of(coupon);
+        entityManager.persist(coupon);
+        entityManager.persist(couponRedemption);
+        return couponRedemption;
     }
 }
