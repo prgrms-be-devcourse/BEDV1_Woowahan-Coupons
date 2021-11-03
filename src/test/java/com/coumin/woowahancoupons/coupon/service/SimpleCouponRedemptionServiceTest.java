@@ -5,8 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.spy;
@@ -46,6 +49,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -228,7 +232,8 @@ class SimpleCouponRedemptionServiceTest {
     void issueCouponCodesSuccessTest(int issuanceCount) {
         //Given
         Long couponId = 1L;
-        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount + 1).allocatedCount(0).build());
+        Coupon spyCoupon = spy(
+            TestCouponFactory.builder().maxCount(issuanceCount + 1).allocatedCount(0).build());
         ArrayList mockList = mock(ArrayList.class);
         given(couponRepository.findByIdForUpdate(couponId)).willReturn(Optional.of(spyCoupon));
         given(couponRedemptionRepository.saveAll(any())).willReturn(mockList);
@@ -248,7 +253,8 @@ class SimpleCouponRedemptionServiceTest {
     void issueCouponCodesFailureTest(int issuanceCount) {
         //Given
         Long couponId = 1L;
-        Coupon spyCoupon = spy(TestCouponFactory.builder().maxCount(issuanceCount - 1).allocatedCount(0).build());
+        Coupon spyCoupon = spy(
+            TestCouponFactory.builder().maxCount(issuanceCount - 1).allocatedCount(0).build());
         given(couponRepository.findByIdForUpdate(couponId)).willReturn(Optional.of(spyCoupon));
 
         //When Then
@@ -260,24 +266,33 @@ class SimpleCouponRedemptionServiceTest {
     @DisplayName("사용자의 쿠폰 사용 - 성공 테스트")
     void useCustomerCouponSuccessTest() {
         //Given
-        Long couponRedemptionId = 1L;
-        Coupon spyCoupon = spy(TestCouponFactory.builder().build());
-        Customer mockCustomer = mock(Customer.class);
-        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mockCustomer));
-        given(couponRedemptionRepository.findById(couponRedemptionId))
-            .willReturn(Optional.of(spyCouponRedemption));
+        try(MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            Long couponRedemptionId = 1L;
+            LocalDateTime mockNow = LocalDateTime.of(2021, 11, 3, 17, 45, 30);
+            Coupon spyCoupon = spy(TestCouponFactory.builder().build());
+            Customer mockCustomer = mock(Customer.class);
+            CouponRedemption spyCouponRedemption = spy(
+                CouponRedemption.of(spyCoupon, mockCustomer));
 
-        //When
-        couponRedemptionService.useCustomerCoupon(couponRedemptionId);
+            localDateTimeMockedStatic.when(LocalDateTime::now).thenReturn(mockNow);
+            given(couponRedemptionRepository.findById(couponRedemptionId))
+                .willReturn(Optional.of(spyCouponRedemption));
 
-        //Then
-        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
-        verify(spyCouponRedemption, times(1)).use();
-        SoftAssertions.assertSoftly(softAssertions -> {
-                softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(true);
-                softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isBefore(LocalDateTime.now());
-            }
-        );
+            //When
+            couponRedemptionService.useCustomerCoupon(couponRedemptionId);
+
+            //Then
+            verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
+            verify(spyCouponRedemption, times(1)).use();
+            SoftAssertions.assertSoftly(softAssertions -> {
+                    softAssertions.assertThat(spyCouponRedemption.isUsed()).isEqualTo(true);
+                    softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isAfter(LocalDateTime.of(2021, 11, 3, 17, 45, 29));
+                    softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isEqualTo(mockNow);
+                    softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isBefore(LocalDateTime.of(2021, 11, 3, 17, 45, 31));
+                }
+            );
+        }
+
     }
 
     @Test
