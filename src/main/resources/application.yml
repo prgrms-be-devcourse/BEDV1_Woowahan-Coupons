@@ -25,3 +25,8 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
 
+server:
+  servlet:
+    encoding:
+      force: true
+      charset: UTF-8
