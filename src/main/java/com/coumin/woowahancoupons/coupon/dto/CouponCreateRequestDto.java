@@ -20,7 +20,6 @@ public class CouponCreateRequestDto {
     private String name;
 
     @Max(10_000)
-    @Min(1000)
     private Long amount;
 
     @Max(100_000)
@@ -40,12 +39,10 @@ public class CouponCreateRequestDto {
     @Min(1)
     private Integer maxCount;
 
-    @Max(10_000)
-    @Min(0)
     private Integer allocatedCount;
 
     @Max(5)
-    @Min(0)
+    @Min(1)
     private Integer maxCountPerCustomer;
 
     private String promotionCode;
@@ -55,7 +52,6 @@ public class CouponCreateRequestDto {
 
     private LocalDateTime startAt;
 
-    @FutureOrPresent(message = "creation date must be future or present.")
     private LocalDateTime expiredAt;
 
     @Max(365)
