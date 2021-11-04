@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 
+import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponResponseDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
@@ -30,6 +31,7 @@ class SimpleStoreServiceTest {
 
     @InjectMocks
     private SimpleStoreService simpleStoreService;
+
 
     @Test
     @DisplayName("매장의 쿠폰 리스트 조회 서비스 성공")

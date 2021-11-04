@@ -2,6 +2,7 @@ package com.coumin.woowahancoupons.coupon.converter;
 
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
+import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.DiscountType;
 import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
@@ -15,19 +16,20 @@ public class CouponConverter {
     public Coupon convertToCoupon(CouponCreateRequestDto dto) {
 
         ExpirationPolicy expirationPolicy;
-        if (ExpirationPolicyType.valueOf(dto.getExpirationPolicyType()) == ExpirationPolicyType.PERIOD) {
+        if (ExpirationPolicyType.valueOf(dto.getExpirationPolicyType())
+            == ExpirationPolicyType.PERIOD) {
             expirationPolicy = ExpirationPolicy.newByPeriod(dto.getStartAt(), dto.getExpiredAt());
         } else {
             expirationPolicy = ExpirationPolicy.newByAfterIssueDate(dto.getDaysFromIssuance());
         }
 
         return Coupon.builder(
-            dto.getName(),
-            dto.getAmount(),
-            expirationPolicy,
-            DiscountType.valueOf(dto.getDiscountType()),
-            IssuerType.valueOf(dto.getIssuerType()),
-            dto.getIssuerId())
+                dto.getName(),
+                dto.getAmount(),
+                expirationPolicy,
+                DiscountType.valueOf(dto.getDiscountType()),
+                IssuerType.valueOf(dto.getIssuerType()),
+                dto.getIssuerId())
             .minOrderPrice(dto.getMinOrderPrice())
             .maxCount(dto.getMaxCount())
             .allocatedCount(dto.getAllocatedCount())
@@ -68,6 +70,19 @@ public class CouponConverter {
             .allocatedCount(coupon.getAllocatedCount())
             .maxCountPerCustomer(coupon.getMaxCountPerCustomer())
             .promotionCode(coupon.getPromotionCode())
+            .build();
+    }
+
+    public Coupon storeCouponSaveDtoToEntity(StoreCouponSaveDto storeCouponSaveDto, Long issuerId) {
+        return Coupon.builder(
+                storeCouponSaveDto.getName(),
+                storeCouponSaveDto.getAmount(),
+                ExpirationPolicy.newByAfterIssueDate(storeCouponSaveDto.getDaysAfterIssuance()),
+                DiscountType.FIXED_AMOUNT,
+                IssuerType.STORE,
+                issuerId)
+            .minOrderPrice(storeCouponSaveDto.getMinOrderPrice())
+            .maxCountPerCustomer(1)
             .build();
     }
 }
