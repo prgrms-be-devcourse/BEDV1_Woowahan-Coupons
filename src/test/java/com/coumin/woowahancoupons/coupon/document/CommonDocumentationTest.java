@@ -1,4 +1,4 @@
-package com.coumin.woowahancoupons.coupon.controller;
+package com.coumin.woowahancoupons.coupon.document;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -7,30 +7,14 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.subsecti
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.coumin.woowahancoupons.ApiDocumentationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(CouponRedemptionRestController.class)
-class CommonDocumentationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private CouponRedemptionService couponRedemptionService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class CommonDocumentationTest extends ApiDocumentationTest {
 
     @Test
     void commonDocs() throws Exception {

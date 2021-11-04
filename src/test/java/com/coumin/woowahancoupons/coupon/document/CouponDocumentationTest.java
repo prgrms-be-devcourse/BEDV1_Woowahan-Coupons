@@ -1,4 +1,4 @@
-package com.coumin.woowahancoupons.coupon.controller;
+package com.coumin.woowahancoupons.coupon.document;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -12,37 +12,20 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coumin.woowahancoupons.ApiDocumentationTest;
 import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
-import com.coumin.woowahancoupons.coupon.service.CouponService;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(CouponRestController.class)
-class CouponDocumentationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private CouponService couponService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class CouponDocumentationTest extends ApiDocumentationTest {
 
     @Test
     @DisplayName("매장의 쿠폰 생성")
