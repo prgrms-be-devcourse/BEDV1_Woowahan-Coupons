@@ -1,0 +1,67 @@
+:hardbreaks:
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+
+= 우아한 쿠폰들
+
+== 공통응답
+include::{snippets}/common/response-fields.adoc[]
+== 쿠폰 생성
+
+=== 상점의 쿠폰 생성
+include::{snippets}/store-coupon-create/path-parameters.adoc[]
+include::{snippets}/store-coupon-create/request-fields.adoc[]
+include::{snippets}/store-coupon-create/http-request.adoc[]
+
+.Response
+include::{snippets}/store-coupon-create/http-response.adoc[]
+
+=== 관리자의 쿠폰 생성
+include::{snippets}/admin-coupon-create/path-parameters.adoc[]
+include::{snippets}/admin-coupon-create/request-fields.adoc[]
+include::{snippets}/admin-coupon-create/http-request.adoc[]
+
+.Response
+include::{snippets}/admin-coupon-create/http-response.adoc[]
+
+== 쿠폰 Action
+
+=== 쿠폰 코드 발행
+include::{snippets}/couponCode-issue/path-parameters.adoc[]
+include::{snippets}/couponCode-issue/request-fields.adoc[]
+include::{snippets}/couponCode-issue/http-request.adoc[]
+
+.Response
+include::{snippets}/couponCode-issue/http-response.adoc[]
+
+=== 쿠폰 코드 등록
+include::{snippets}/couponCode-register/path-parameters.adoc[]
+include::{snippets}/couponCode-register/http-request.adoc[]
+
+.Response
+include::{snippets}/couponCode-register/http-response.adoc[]
+
+=== 쿠폰 자동 할당
+include::{snippets}/coupon-allocate-with-issuance/path-parameters.adoc[]
+include::{snippets}/coupon-allocate-with-issuance/http-request.adoc[]
+
+.Response
+include::{snippets}/coupon-allocate-with-issuance/http-response.adoc[]
+
+=== 쿠폰 사용
+include::{snippets}/coupon-use/path-parameters.adoc[]
+include::{snippets}/coupon-use/http-request.adoc[]
+
+.Response
+include::{snippets}/coupon-use/http-response.adoc[]
+
+== 쿠폰 조회
+
+=== 고객의 사용가능한 쿠폰 조회
+include::{snippets}/customer-availableCoupon-list/path-parameters.adoc[]
+include::{snippets}/customer-availableCoupon-list/http-request.adoc[]
+
+.Response
+include::{snippets}/customer-availableCoupon-list/response-fields-data.adoc[]
+include::{snippets}/customer-availableCoupon-list/http-response.adoc[]
