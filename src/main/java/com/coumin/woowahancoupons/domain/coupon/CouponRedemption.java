@@ -4,8 +4,10 @@ import com.coumin.woowahancoupons.domain.BaseEntity;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.Order;
 import com.coumin.woowahancoupons.global.exception.CouponAlreadyUseException;
+import com.coumin.woowahancoupons.global.exception.CouponMinOrderPriceNotSatisfyException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionExpireException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
+import com.coumin.woowahancoupons.global.exception.CouponIssuerIdNotMatchException;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -71,6 +73,11 @@ public class CouponRedemption extends BaseEntity {
         this.customer = customer;
     }
 
+    public void verifyForUse(long issuerId, long orderPrice) {
+        verifyCouponIssuerId(issuerId);
+        verifyCouponMinOrderPrice(orderPrice);
+    }
+
     public void use() {
         verifyExpiration();
         verifyUsed();
@@ -84,6 +91,18 @@ public class CouponRedemption extends BaseEntity {
         }
     }
 
+    private void verifyCouponIssuerId(long issuerId) {
+        if (coupon.isNotAdminCoupon() && issuerId != coupon.getIssuerId()) {
+            throw new CouponIssuerIdNotMatchException(coupon.getIssuerType().name(), issuerId);
+        }
+    }
+
+    private void verifyCouponMinOrderPrice(long orderPrice) {
+        if(coupon.getMinOrderPrice() != null && orderPrice < coupon.getMinOrderPrice()) {
+            throw new CouponMinOrderPriceNotSatisfyException(coupon.getMinOrderPrice());
+        }
+    }
+
     private void verifyExpiration() {
         if (expirationPeriod.isExpiration()) {
             throw new CouponRedemptionExpireException();
@@ -94,5 +113,9 @@ public class CouponRedemption extends BaseEntity {
         if (used) {
             throw new CouponAlreadyUseException();
         }
+    }
+
+    public boolean isBrandCouponRedemption() {
+        return coupon.isBrandCoupon();
     }
 }

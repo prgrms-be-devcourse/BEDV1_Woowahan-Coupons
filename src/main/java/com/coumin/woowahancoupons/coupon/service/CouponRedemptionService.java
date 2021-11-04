@@ -1,5 +1,6 @@
 package com.coumin.woowahancoupons.coupon.service;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCheckRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponRedemptionResponseDto;
 import java.util.List;
 import java.util.UUID;
@@ -14,5 +15,8 @@ public interface CouponRedemptionService {
 
     void issueCouponCodes(Long couponId, int issuanceCount);
 
+    void checkCouponForUse(Long couponRedemptionId, CouponCheckRequestDto couponCheckRequestDto);
+
     void useCustomerCoupon(Long couponRedemptionId);
+
 }

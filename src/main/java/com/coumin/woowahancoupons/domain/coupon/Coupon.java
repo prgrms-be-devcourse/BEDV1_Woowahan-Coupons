@@ -108,4 +108,12 @@ public class Coupon extends BaseEntity {
     public void increaseAllocatedCount(int count) {
         this.allocatedCount += count;
     }
+
+    public boolean isBrandCoupon() {
+        return issuerType == IssuerType.BRAND;
+    }
+
+    public boolean isNotAdminCoupon() {
+        return issuerType != IssuerType.ADMIN;
+    }
 }

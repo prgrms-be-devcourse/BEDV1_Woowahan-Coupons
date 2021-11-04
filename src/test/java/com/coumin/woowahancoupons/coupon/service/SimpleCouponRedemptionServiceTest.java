@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
@@ -17,17 +16,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.coumin.woowahancoupons.coupon.converter.CouponRedemptionConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponCheckRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponRedemptionResponseDto;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemptionRepository;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
+import com.coumin.woowahancoupons.domain.coupon.IssuerType;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
+import com.coumin.woowahancoupons.domain.store.Brand;
+import com.coumin.woowahancoupons.domain.store.Store;
+import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.coumin.woowahancoupons.global.exception.CouponAlreadyUseException;
+import com.coumin.woowahancoupons.global.exception.CouponIssuerIdNotMatchException;
 import com.coumin.woowahancoupons.global.exception.CouponMaxCountOverException;
+import com.coumin.woowahancoupons.global.exception.CouponMinOrderPriceNotSatisfyException;
 import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionExpireException;
@@ -66,6 +72,9 @@ class SimpleCouponRedemptionServiceTest {
 
     @Mock
     private CouponRedemptionConverter couponRedemptionConverter;
+
+    @Mock
+    private StoreRepository storeRepository;
 
     @InjectMocks
     private SimpleCouponRedemptionService couponRedemptionService;
@@ -368,5 +377,173 @@ class SimpleCouponRedemptionServiceTest {
                 softAssertions.assertThat(spyCouponRedemption.getUsedAt()).isNull();
             }
         );
+    }
+
+    @Test
+    @DisplayName("주문시 쿠폰의 사용유무 체크 - 쿠폰 성공 테스트 (admin Type)")
+    void checkForUseSuccessTest() {
+        //Given
+        long couponAdminId = 1L;
+        long storeId = 2L;
+        long orderPrice = 10000L;
+        long couponRedemptionId = 3L;
+
+        Coupon spyCoupon = spy(TestCouponFactory.builder()
+            .minOrderPrice(orderPrice)
+            .issuerType(IssuerType.ADMIN)
+            .issuerId(couponAdminId)
+            .build());
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mock(Customer.class)));
+        CouponCheckRequestDto couponCheckRequestDto = mock(CouponCheckRequestDto.class);
+
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        given(couponCheckRequestDto.getStoreId()).willReturn(storeId);
+        given(couponCheckRequestDto.getOrderPrice()).willReturn(orderPrice);
+
+        //When
+        couponRedemptionService.checkCouponForUse(couponRedemptionId, couponCheckRequestDto);
+
+        //Then
+        assertThat(spyCouponRedemption.isBrandCouponRedemption()).isFalse();
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
+        verify(storeRepository, never()).findById(storeId);
+        verify(spyCouponRedemption, times(1)).verifyForUse(storeId, orderPrice);
+    }
+
+    @Test
+    @DisplayName("주문시 쿠폰의 사용유무 체크 - 쿠폰 성공 테스트 (store Type)")
+    void checkForUseSuccessTest2() {
+        //Given
+        long storeId = 1L;
+        long orderPrice = 10000L;
+        long couponRedemptionId = 2L;
+
+        Coupon spyCoupon = spy(TestCouponFactory.builder()
+            .issuerType(IssuerType.STORE)
+            .issuerId(storeId)
+            .build());
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mock(Customer.class)));
+        CouponCheckRequestDto couponCheckRequestDto = mock(CouponCheckRequestDto.class);
+
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        given(couponCheckRequestDto.getStoreId()).willReturn(storeId);
+        given(couponCheckRequestDto.getOrderPrice()).willReturn(orderPrice);
+
+        //When
+        couponRedemptionService.checkCouponForUse(couponRedemptionId, couponCheckRequestDto);
+
+        //Then
+        assertThat(spyCouponRedemption.isBrandCouponRedemption()).isFalse();
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
+        verify(storeRepository, never()).findById(storeId);
+        verify(spyCouponRedemption, times(1)).verifyForUse(storeId, orderPrice);
+    }
+
+    @Test
+    @DisplayName("주문시 쿠폰의 사용유무 체크 - 쿠폰 성공 테스트 (brand Type)")
+    void checkForUseSuccessTest3() {
+        //Given
+        long brandId = 1L;
+        long storeId = 2L;
+        long orderPrice = 10000L;
+        long couponRedemptionId = 3L;
+
+        Brand mockBrand = mock(Brand.class);
+        Store mockStore = mock(Store.class);
+        Coupon spyCoupon = spy(TestCouponFactory.builder()
+            .minOrderPrice(orderPrice)
+            .issuerType(IssuerType.BRAND)
+            .issuerId(brandId)
+            .build());
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mock(Customer.class)));
+        CouponCheckRequestDto couponCheckRequestDto = mock(CouponCheckRequestDto.class);
+
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        given(couponCheckRequestDto.getStoreId()).willReturn(storeId);
+        given(couponCheckRequestDto.getOrderPrice()).willReturn(orderPrice);
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(mockStore));
+        given(mockStore.getBrand()).willReturn(mockBrand);
+        given(mockBrand.getId()).willReturn(brandId);
+
+        //When
+        couponRedemptionService.checkCouponForUse(couponRedemptionId, couponCheckRequestDto);
+
+        //Then
+        assertThat(spyCouponRedemption.isBrandCouponRedemption()).isTrue();
+        verify(couponRedemptionRepository, times(1)).findById(couponRedemptionId);
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(spyCouponRedemption, times(1)).verifyForUse(brandId, orderPrice);
+    }
+
+    @Test
+    @DisplayName("주문시 쿠폰의 사용유무 체크 - 실패 테스트 (최소주문 금액 미달)")
+    void checkForUseFailureTest() {
+        //Given
+        long couponAdminId = 1L;
+        long storeId = 2L;
+        long orderPrice = 10000L;
+        long couponRedemptionId = 3L;
+
+        Coupon spyCoupon = spy(TestCouponFactory.builder()
+            .minOrderPrice(20000L)
+            .issuerType(IssuerType.ADMIN)
+            .issuerId(couponAdminId)
+            .build());
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mock(Customer.class)));
+        CouponCheckRequestDto couponCheckRequestDto = mock(CouponCheckRequestDto.class);
+
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        given(couponCheckRequestDto.getStoreId()).willReturn(storeId);
+        given(couponCheckRequestDto.getOrderPrice()).willReturn(orderPrice);
+
+        //When, Then
+        assertThatThrownBy(() -> couponRedemptionService
+            .checkCouponForUse(couponRedemptionId, couponCheckRequestDto))
+            .isInstanceOf(CouponMinOrderPriceNotSatisfyException.class)
+            .hasMessageContaining(String.format(
+                ErrorCode.COUPON_MIN_ORDER_PRICE_NOT_SATISFY.getMessage(), 20000L));
+    }
+
+    @Test
+    @DisplayName("주문시 쿠폰의 사용유무 체크 - 실패 테스트 (해당 매장은 쿠폰의 브랜드가 아님)")
+    void checkForUseFailureTest2() {
+        //Given
+        long brandId = 1L;
+        long storeId = 2L;
+        long orderPrice = 10000L;
+        long couponRedemptionId = 3L;
+        long otherBrandId = 4L;
+
+        Brand mockBrand = mock(Brand.class);
+        Store mockStore = mock(Store.class);
+        Coupon spyCoupon = spy(TestCouponFactory.builder()
+            .minOrderPrice(orderPrice)
+            .issuerType(IssuerType.BRAND)
+            .issuerId(brandId)
+            .build());
+        CouponRedemption spyCouponRedemption = spy(CouponRedemption.of(spyCoupon, mock(Customer.class)));
+        CouponCheckRequestDto couponCheckRequestDto = mock(CouponCheckRequestDto.class);
+
+        given(couponRedemptionRepository.findById(couponRedemptionId))
+            .willReturn(Optional.of(spyCouponRedemption));
+        given(couponCheckRequestDto.getStoreId()).willReturn(storeId);
+        given(couponCheckRequestDto.getOrderPrice()).willReturn(orderPrice);
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(mockStore));
+        given(mockStore.getBrand()).willReturn(mockBrand);
+        given(mockBrand.getId()).willReturn(otherBrandId);
+
+        //When, Then
+        assertThatThrownBy(() -> couponRedemptionService
+            .checkCouponForUse(couponRedemptionId, couponCheckRequestDto))
+            .isInstanceOf(CouponIssuerIdNotMatchException.class)
+            .hasMessageContaining(String.format(
+                ErrorCode.COUPON_ISSUER_ID_NOT_MATCH.getMessage(),
+                IssuerType.BRAND,
+                otherBrandId)
+            );
     }
 }

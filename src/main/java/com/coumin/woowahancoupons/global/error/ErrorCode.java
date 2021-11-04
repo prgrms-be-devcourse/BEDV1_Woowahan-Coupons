@@ -20,7 +20,10 @@ public enum ErrorCode {
     COUPON_REDEMPTION_ALREADY_ALLOCATE(400, "CO06", "CouponRedemption was already allocated"),
     COUPON_REDEMPTION_ALREADY_USE(400, "CO07", "CouponRedemption was already used"),
     COUPON_REDEMPTION_EXPIRE(400, "CO08", "CouponRedemption was already expired"),
-    COUPON_MAX_COUNT_OVER(400, "CP02", "Can not issue coupon codes. coupon's maxCount : %d, allocatedCount : %d, but your request count : %d");
+    COUPON_MAX_COUNT_OVER(400, "CP02", "Can not issue coupon codes. coupon's maxCount : %d, allocatedCount : %d, but your request count : %d"),
+
+    COUPON_ISSUER_ID_NOT_MATCH(400, "C009", "Can only be used by %s(%d)"),
+    COUPON_MIN_ORDER_PRICE_NOT_SATISFY(400, "C010", "Can be used when order price is more than %d원");
 
     private final int status;
     private final String code;
