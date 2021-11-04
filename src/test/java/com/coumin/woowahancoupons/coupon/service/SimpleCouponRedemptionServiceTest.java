@@ -420,7 +420,6 @@ class SimpleCouponRedemptionServiceTest {
         long couponRedemptionId = 2L;
 
         Coupon spyCoupon = spy(TestCouponFactory.builder()
-            .minOrderPrice(orderPrice)
             .issuerType(IssuerType.STORE)
             .issuerId(storeId)
             .build());

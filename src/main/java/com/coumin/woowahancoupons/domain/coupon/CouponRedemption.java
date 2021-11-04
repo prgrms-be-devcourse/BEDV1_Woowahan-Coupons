@@ -98,7 +98,7 @@ public class CouponRedemption extends BaseEntity {
     }
 
     private void verifyCouponMinOrderPrice(long orderPrice) {
-        if(orderPrice < coupon.getMinOrderPrice()) {
+        if(coupon.getMinOrderPrice() != null && orderPrice < coupon.getMinOrderPrice()) {
             throw new CouponMinOrderPriceNotSatisfyException(coupon.getMinOrderPrice());
         }
     }
