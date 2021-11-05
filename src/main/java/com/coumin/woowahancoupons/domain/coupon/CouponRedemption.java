@@ -104,7 +104,7 @@ public class CouponRedemption extends BaseEntity {
     }
 
     private void verifyExpiration() {
-        if (expirationPeriod.isExpiration()) {
+        if (isExpiration()) {
             throw new CouponRedemptionExpireException();
         }
     }
@@ -113,6 +113,10 @@ public class CouponRedemption extends BaseEntity {
         if (used) {
             throw new CouponAlreadyUseException();
         }
+    }
+
+    public boolean isExpiration() {
+        return expirationPeriod.isExpiration();
     }
 
     public boolean isBrandCouponRedemption() {
