@@ -297,8 +297,24 @@ class CouponRedemptionRestControllerTest {
         Coupon givenCoupon = givenCoupon();
         Customer givenCustomer = givenCustomer();
         Long customerId = givenCustomer.getId();
-        IntStream.range(0, 5)
+
+        IntStream.range(0, 2)
             .mapToObj(i -> CouponRedemption.of(givenCoupon, givenCustomer))
+            .forEach(couponRedemption -> entityManager.persist(couponRedemption));
+        IntStream.range(0, 2)
+            .mapToObj(i -> CouponRedemption.of(givenCoupon, givenCustomer))
+            .forEach(couponRedemption -> {
+                couponRedemption.use();
+                entityManager.persist(couponRedemption);
+            });
+        Coupon expiredCoupon = TestCouponFactory.builder()
+            .expirationPolicy(ExpirationPolicy.newByPeriod(
+                LocalDateTime.now().minusYears(10),
+                LocalDateTime.now().minusYears(5)
+            )).build();
+        entityManager.persist(expiredCoupon);
+        IntStream.range(0, 2)
+            .mapToObj(i -> CouponRedemption.of(expiredCoupon, givenCustomer))
             .forEach(couponRedemption -> entityManager.persist(couponRedemption));
 
         //When
@@ -312,7 +328,7 @@ class CouponRedemptionRestControllerTest {
             .andExpect(handler().handlerType(CouponRedemptionRestController.class))
             .andExpect(handler().methodName("getCustomerCouponRedemptions"))
             .andExpect(jsonPath("$.success", is(true)))
-            .andExpect(jsonPath("$.data", hasSize(5)))
+            .andExpect(jsonPath("$.data", hasSize(2)))
             .andExpect(jsonPath("$.data[0].id", is(notNullValue())))
             .andExpect(jsonPath("$.data[0].couponCode", is(notNullValue())))
             .andExpect(jsonPath("$.data[0].startAt", is(notNullValue())))
