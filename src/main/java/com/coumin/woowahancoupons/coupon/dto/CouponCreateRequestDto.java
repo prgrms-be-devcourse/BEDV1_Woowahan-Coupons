@@ -1,11 +1,13 @@
 package com.coumin.woowahancoupons.coupon.dto;
 
+import com.coumin.woowahancoupons.coupon.validator.annotation.CouponAmountConstraint;
+import com.coumin.woowahancoupons.coupon.validator.annotation.FixedAmountGroup;
+import com.coumin.woowahancoupons.coupon.validator.annotation.PercentAmountGroup;
 import java.time.LocalDateTime;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
@@ -13,15 +15,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@CouponAmountConstraint
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CouponCreateRequestDto {
 
     @Size(min = 1, max = 100)
-    @NotNull
+    @NotBlank
     private String name;
 
-    @Max(10_000)
+    @Max(value = 10_000, groups = FixedAmountGroup.class)
+    @Min(value = 1000, groups = FixedAmountGroup.class)
+    @Max(value = 100, groups = PercentAmountGroup.class)
+    @Min(value = 10, groups = PercentAmountGroup.class)
     private Long amount;
 
     @Max(100_000)
