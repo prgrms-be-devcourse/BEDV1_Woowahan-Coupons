@@ -30,6 +30,7 @@ public class CouponAmountConstraintValidator implements
             constraintViolations
                 .forEach(constraintViolation -> context
                     .buildConstraintViolationWithTemplate(constraintViolation.getMessage())
+                    .addPropertyNode(constraintViolation.getPropertyPath().toString())
                     .addConstraintViolation());
             return false;
         }
