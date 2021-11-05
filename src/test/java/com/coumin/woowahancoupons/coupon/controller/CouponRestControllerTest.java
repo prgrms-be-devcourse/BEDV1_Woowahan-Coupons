@@ -164,7 +164,7 @@ class CouponRestControllerTest {
             .andExpect(status().isOk())
             .andExpect(handler().handlerType(CouponRestController.class))
             .andExpect(handler().methodName("createAdminCoupon"))
-            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.data.name", is("기리보이가 쏜다")))
             .andExpect(jsonPath("$.data.amount", is(10_000)))
             .andExpect(jsonPath("$.data.minOrderPrice", is(10_000)))
