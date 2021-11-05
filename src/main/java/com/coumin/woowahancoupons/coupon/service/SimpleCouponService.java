@@ -44,7 +44,8 @@ public class SimpleCouponService implements CouponService {
         }
 
         List<Coupon> coupons = requestDto.getStoreCouponSaves().stream()
-            .map(storeCouponSaveDto -> storeCouponSaveDto.toEntity(storeId))
+            .map(storeCouponSaveDto -> couponConverter.storeCouponSaveDtoToEntity(
+                storeCouponSaveDto, storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);
     }

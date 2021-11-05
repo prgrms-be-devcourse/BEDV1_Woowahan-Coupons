@@ -8,6 +8,7 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.domain.coupon.CouponRepository;
@@ -33,6 +34,9 @@ class SimpleCouponServiceTest {
     @Mock
     private CouponRepository couponRepository;
 
+    @Mock
+    private CouponConverter couponConverter;
+
     @InjectMocks
     private SimpleCouponService couponService;
 
@@ -50,7 +54,6 @@ class SimpleCouponServiceTest {
                 .build())
             .collect(Collectors.toList());
         StoreCouponSaveRequestDto requestDto = new StoreCouponSaveRequestDto(storeCouponSaveDtos);
-
         given(storeRepository.existsById(storeId)).willReturn(true);
 
         //When
