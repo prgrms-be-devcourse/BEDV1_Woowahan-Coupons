@@ -16,8 +16,11 @@ import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdmin;
 import com.coumin.woowahancoupons.domain.coupon.CouponAdminRepository;
+import com.coumin.woowahancoupons.domain.coupon.DiscountType;
+import com.coumin.woowahancoupons.domain.coupon.IssuerType;
 import com.coumin.woowahancoupons.domain.store.Store;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
+import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -132,8 +135,8 @@ class CouponRestControllerTest {
     }
 
     @Test
-    @DisplayName("관리자가 쿠폰을 발행 할 수 있다.")
-    void createAdminCouponTest() throws Exception {
+    @DisplayName("관리자가 쿠폰을 발행 - 테스트 성공")
+    void createAdminCouponSuccessTest() throws Exception {
         //Given
         Long couponAdminId = couponAdminRepository.save(new CouponAdmin("Admin_WOOCOU")).getId();
 
@@ -151,9 +154,9 @@ class CouponRestControllerTest {
 
         //When
         ResultActions resultActions = mvc.perform(
-                post("/api/v1/coupons/{couponAdminId}", couponAdminId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(couponCreateRequestDto)))
+            post("/api/v1/coupons/{couponAdminId}", couponAdminId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(couponCreateRequestDto)))
             .andDo(print());
 
         //Then
@@ -161,15 +164,89 @@ class CouponRestControllerTest {
             .andExpect(status().isOk())
             .andExpect(handler().handlerType(CouponRestController.class))
             .andExpect(handler().methodName("createAdminCoupon"))
-            .andExpect(jsonPath("$.error", is(nullValue())))
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.data.name", is("기리보이가 쏜다")))
             .andExpect(jsonPath("$.data.amount", is(10_000)))
             .andExpect(jsonPath("$.data.minOrderPrice", is(10_000)))
             .andExpect(jsonPath("$.data.maxCount", is(10)))
             .andExpect(jsonPath("$.data.allocatedCount", is(10)))
-            .andExpect(jsonPath("$.data.promotionCode", is("프로모션코드")));
+            .andExpect(jsonPath("$.data.promotionCode", is("프로모션코드")))
+            .andExpect(jsonPath("$.error", is(nullValue())));
 
+    }
+
+    @Test
+    @DisplayName("관리자가 쿠폰을 발행 - 테스트 실패(고정 할인 쿠폰 최소 금액 미달)")
+    void createAdminCouponFailureTest() throws Exception {
+        //Given
+        Long couponAdminId = couponAdminRepository.save(new CouponAdmin("Admin_WOOCOU")).getId();
+
+        CouponCreateRequestDto couponCreateRequestDto = couponConverter
+            .convertToCouponCreateRequest(
+                TestCouponFactory.builder()
+                    .name("기리보이가 쏜다")
+                    .amount(999L)
+                    .minOrderPrice(10_000L)
+                    .discountType(DiscountType.FIXED_AMOUNT)
+                    .issuerType(IssuerType.ADMIN)
+                    .issuerId(1L)
+                    .maxCount(10)
+                    .allocatedCount(10)
+                    .promotionCode("프로모션코드")
+                    .build()
+            );
+
+        //When
+        ResultActions resultActions = mvc.perform(
+                post("/api/v1/coupons/{couponAdminId}", couponAdminId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(couponCreateRequestDto)))
+            .andDo(print());
+
+        //Then
+        resultActions.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(handler().handlerType(CouponRestController.class))
+            .andExpect(handler().methodName("createAdminCoupon"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())));
+    }
+
+    @Test
+    @DisplayName("관리자가 쿠폰을 발행 - 테스트 실패(퍼센티지 할인 쿠폰 최대 퍼센티지 초과)")
+    void createAdminCouponFailureTest2() throws Exception {
+        //Given
+        Long couponAdminId = couponAdminRepository.save(new CouponAdmin("Admin_WOOCOU")).getId();
+
+        CouponCreateRequestDto couponCreateRequestDto = couponConverter
+            .convertToCouponCreateRequest(
+                TestCouponFactory.builder()
+                    .name("기리보이가 쏜다")
+                    .amount(101L)
+                    .minOrderPrice(10_000L)
+                    .discountType(DiscountType.PERCENT_DISCOUNT)
+                    .issuerType(IssuerType.ADMIN)
+                    .issuerId(1L)
+                    .maxCount(10)
+                    .allocatedCount(10)
+                    .promotionCode("프로모션코드")
+                    .build()
+            );
+
+        //When
+        ResultActions resultActions = mvc.perform(
+            post("/api/v1/coupons/{couponAdminId}", couponAdminId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(couponCreateRequestDto)))
+            .andDo(print());
+
+        //Then
+        resultActions.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(handler().handlerType(CouponRestController.class))
+            .andExpect(handler().methodName("createAdminCoupon"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())));
     }
 
     private ResultActions requestCreateStoreCoupons(long storeId,
@@ -180,6 +257,5 @@ class CouponRestControllerTest {
             .content(objectMapper.writeValueAsString(requestDto)))
             .andDo(print());
     }
-
 }
 

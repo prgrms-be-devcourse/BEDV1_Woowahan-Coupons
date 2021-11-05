@@ -1,6 +1,7 @@
 package com.coumin.woowahancoupons.coupon.dto;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ public class CouponCheckRequestDto {
     @NotNull
     private Long storeId;
 
+    @PositiveOrZero
     @NotNull
     private Long orderPrice;
 
