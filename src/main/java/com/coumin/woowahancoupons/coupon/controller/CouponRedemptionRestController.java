@@ -1,5 +1,6 @@
 package com.coumin.woowahancoupons.coupon.controller;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCheckRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponIssuanceDto;
 import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.global.ApiResponse;
@@ -52,6 +53,15 @@ public class CouponRedemptionRestController {
         @Valid @RequestBody CouponIssuanceDto couponIssuanceDto
     ) {
         couponRedemptionService.issueCouponCodes(couponId, couponIssuanceDto.getIssuanceCount());
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/{couponRedemptionId}/check")
+    public ApiResponse<Object> checkCouponRedemptionForUse(
+        @PathVariable("couponRedemptionId") Long couponRedemptionId,
+        @Valid @RequestBody CouponCheckRequestDto couponCheckRequestDto
+    ) {
+        couponRedemptionService.checkCouponForUse(couponRedemptionId, couponCheckRequestDto);
         return ApiResponse.success();
     }
 
