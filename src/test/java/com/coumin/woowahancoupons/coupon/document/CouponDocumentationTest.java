@@ -12,7 +12,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coumin.woowahancoupons.ApiDocumentationTest;
 import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;

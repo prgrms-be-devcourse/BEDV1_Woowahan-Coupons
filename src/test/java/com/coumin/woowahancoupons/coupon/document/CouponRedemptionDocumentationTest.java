@@ -16,8 +16,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.coumin.woowahancoupons.ApiDocumentationTest;
 import com.coumin.woowahancoupons.coupon.converter.CouponRedemptionConverter;
+import com.coumin.woowahancoupons.coupon.dto.CouponCheckRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponIssuanceDto;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
@@ -110,6 +110,34 @@ class CouponRedemptionDocumentationTest extends ApiDocumentationTest {
                 ),
                 requestFields(
                     fieldWithPath("issuanceCount").type(JsonFieldType.NUMBER).description("쿠폰 코드 발행 개수")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("쿠폰 사용 가능 유무 확인")
+    void checkCouponRedemptionForUseDocTest() throws Exception {
+        //Given
+        Long couponRedemptionId = 1L;
+        CouponCheckRequestDto couponCheckRequestDto = new CouponCheckRequestDto(1L, 10000L);
+
+        //When
+        ResultActions resultActions = mockMvc.perform(
+            post("/api/v1/coupons/{couponRedemptionId}/check", couponRedemptionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(couponCheckRequestDto)));
+
+        //Then
+        resultActions.andExpect(status().isOk())
+            .andDo(document("coupon-check",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("couponRedemptionId").description("쿠폰발행 Id")
+                ),
+                requestFields(
+                    fieldWithPath("storeId").description("매장 Id"),
+                    fieldWithPath("orderPrice").description("주문 금액")
                 )
             ));
     }
