@@ -12,4 +12,8 @@ public class CouponCheckRequestDto {
 
     private Long orderPrice;
 
+    public CouponCheckRequestDto(Long storeId, Long orderPrice) {
+        this.storeId = storeId;
+        this.orderPrice = orderPrice;
+    }
 }

@@ -13,12 +13,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.coumin.woowahancoupons.coupon.dto.CouponCheckRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponIssuanceDto;
 import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.domain.coupon.Coupon;
 import com.coumin.woowahancoupons.domain.coupon.CouponRedemption;
 import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
+import com.coumin.woowahancoupons.domain.coupon.IssuerType;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.global.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -325,6 +327,97 @@ class CouponRedemptionRestControllerTest {
     }
 
     @Test
+    @DisplayName("쿠폰 사용 가능 유무 확인 - 성공 테스트")
+    void checkCouponRedemptionForUseSuccessTest() throws Exception {
+        //Given
+        Long storeId = 1L;
+        IssuerType issuerType = IssuerType.STORE;
+        Coupon coupon = TestCouponFactory.builder()
+            .issuerId(storeId)
+            .issuerType(issuerType)
+            .build();
+        CouponRedemption couponRedemption = givenCouponRedemptionWithCustomer(coupon);
+        CouponCheckRequestDto couponCheckRequestDto = new CouponCheckRequestDto(storeId, 10000L);
+
+        //When
+        ResultActions result = requestCheckCouponRedemptionForUse(
+            couponRedemption.getId(),
+            couponCheckRequestDto
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("checkCouponRedemptionForUse"))
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
+
+    @Test
+    @DisplayName("쿠폰 사용 가능 유무 확인 테스트 - 실패 테스트 (최소 주문 금액 미달)")
+    void checkCouponRedemptionForUseFailureTest() throws Exception {
+        //Given
+        Long storeId = 1L;
+        IssuerType issuerType = IssuerType.STORE;
+        Long minOrderPrice = 10000L;
+        Coupon coupon = TestCouponFactory.builder()
+            .issuerId(storeId)
+            .issuerType(issuerType)
+            .minOrderPrice(minOrderPrice)
+            .build();
+        CouponRedemption couponRedemption = givenCouponRedemptionWithCustomer(coupon);
+        CouponCheckRequestDto couponCheckRequestDto = new CouponCheckRequestDto(storeId, 9999L);
+
+        //When
+        ResultActions result = requestCheckCouponRedemptionForUse(
+            couponRedemption.getId(),
+            couponCheckRequestDto
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("checkCouponRedemptionForUse"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_MIN_ORDER_PRICE_NOT_SATISFY.getCode())));
+    }
+
+    @Test
+    @DisplayName("쿠폰 사용 가능 유무 확인 테스트 - 실패 테스트 (발급 아이디 다름)")
+    void checkCouponRedemptionForUseFailureTest2() throws Exception {
+        //Given
+        Long storeId = 1L;
+        IssuerType issuerType = IssuerType.STORE;
+        Long minOrderPrice = 10000L;
+        Coupon coupon = TestCouponFactory.builder()
+            .issuerId(storeId)
+            .issuerType(issuerType)
+            .minOrderPrice(minOrderPrice)
+            .build();
+        CouponRedemption couponRedemption = givenCouponRedemptionWithCustomer(coupon);
+        CouponCheckRequestDto couponCheckRequestDto = new CouponCheckRequestDto(2L, 9999L);
+
+        //When
+        ResultActions result = requestCheckCouponRedemptionForUse(
+            couponRedemption.getId(),
+            couponCheckRequestDto
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("checkCouponRedemptionForUse"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_ISSUER_ID_NOT_MATCH.getCode())));
+    }
+
+    @Test
     @DisplayName("쿠폰 사용 - 성공 테스트")
     void userCouponRedemptionTest() throws Exception {
         //Given
@@ -440,5 +533,16 @@ class CouponRedemptionRestControllerTest {
         entityManager.persist(coupon);
         entityManager.persist(couponRedemption);
         return couponRedemption;
+    }
+
+    private ResultActions requestCheckCouponRedemptionForUse(
+        Long couponRedemptionId,
+        CouponCheckRequestDto couponCheckRequestDto
+    ) throws Exception {
+
+        return mockMvc.perform(
+            post("/api/v1/coupons/{couponRedemptionId}/check", couponRedemptionId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(couponCheckRequestDto)));
     }
 }
