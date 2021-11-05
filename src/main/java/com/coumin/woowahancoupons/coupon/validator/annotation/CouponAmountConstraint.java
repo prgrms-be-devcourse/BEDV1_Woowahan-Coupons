@@ -16,7 +16,7 @@ import javax.validation.Payload;
 @Retention(RUNTIME)
 @Documented
 public @interface CouponAmountConstraint {
-    String message() default "test";
+    String message() default "";
 
     Class<?>[] groups() default {};
 
