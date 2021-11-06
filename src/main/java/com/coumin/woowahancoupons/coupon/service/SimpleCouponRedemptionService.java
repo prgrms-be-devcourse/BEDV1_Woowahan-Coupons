@@ -70,12 +70,12 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
             .orElseThrow(() -> new CouponNotFoundException(couponId));
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
-        int customerCouponCount = couponRedemptionRepository.countByCouponIdAndCustomerId(couponId, customerId);
         if (!coupon.canIssueCouponCodes(issuanceCount)) {
             throw new CouponMaxCountOverException(coupon.getMaxCount(), coupon.getAllocatedCount(), issuanceCount);
         }
+        int customerCouponCount = couponRedemptionRepository.countByCouponIdAndCustomerId(couponId, customerId);
         if (!coupon.canIssueCouponCodeToCustomer(customerCouponCount)) {
-            throw new CouponMaxCountPerCustomerOverException(coupon.getMaxCount());
+            throw new CouponMaxCountPerCustomerOverException(coupon.getMaxCountPerCustomer());
         }
         couponRedemptionRepository.save(CouponRedemption.of(coupon, customer));
         coupon.increaseAllocatedCount(issuanceCount);
