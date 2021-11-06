@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    include: prod-db.yml
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        query.in_clause_parameter_padding: true
+        storage_engin: innodb
+        hbm2ddl:
+          auto: none
+        show_sql: false
+        format_sql: true
+
+logging.level:
+  org.hibernate.SQL: debug
+
+server:
+  servlet:
+    encoding:
+      force: true
+      charset: UTF-8
