@@ -5,8 +5,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
 import org.springframework.util.Assert;
 
+@OptimisticLocking(type = OptimisticLockType.DIRTY)
+@DynamicUpdate
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "coupons", indexes = @Index(name = "coupon_idx", columnList = "issuer_id"))
