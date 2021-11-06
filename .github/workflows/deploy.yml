@@ -27,10 +27,13 @@ jobs:
         run: mkdir deploy
 
       - name: Copy Jar
-        run: cp ./build/libs/*.jar ./deploy
+        run: cp ./build/libs/*.jar ./deploy/
 
       - name: Copy appspec
         run: cp ./appspec.yml ./deploy/
+
+      - name: Copy shell
+        run: cp ./deploy.sh ./deploy/
 
       - name: Make zip file
         run: zip -r ./wocou-jar.zip ./deploy
