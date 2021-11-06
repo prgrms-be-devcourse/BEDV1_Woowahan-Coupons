@@ -1,7 +1,7 @@
 name: deploy
 
 on:
-  pull_request:
+  push:
     branches: [ main ]
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload to AWS S3
@@ -47,10 +47,10 @@ jobs:
 
       - name: Code Deploy
         run: |
-          aws deploy create-deployment
+          aws deploy create-deployment \
           --application-name github-actions-deploy \
-          --deployment-group-name github-actions-group
-          --file-exists-behavior OVERWRITE
-          --deployment-config-name CodeDeployDefault.AllAtOnce
-          --s3-location bucket=woowahan-coupons, bundleType=zip, key=wocou-jar.zip
+          --deployment-group-name github-actions-group \
+          --file-exists-behavior OVERWRITE \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --s3-location bucket=woowahan-coupons, bundleType=zip, key=wocou-jar.zip \
           --region ap-northeast-2
