@@ -58,19 +58,19 @@ public class CouponConverter {
     }
 
     public CouponCreateResponseDto convertToCouponCreateResponse(Coupon coupon) {
-        return CouponCreateResponseDto.builder()
-            .name(coupon.getName())
-            .amount(coupon.getAmount())
-            .expirationPolicy(coupon.getExpirationPolicy())
-            .minOrderPrice(coupon.getMinOrderPrice())
-            .discountType(coupon.getDiscountType().name())
-            .issuerType(coupon.getIssuerType().name())
-            .issuerId(coupon.getIssuerId())
-            .maxCount(coupon.getMaxCount())
-            .allocatedCount(coupon.getAllocatedCount())
-            .maxCountPerCustomer(coupon.getMaxCountPerCustomer())
-            .promotionCode(coupon.getPromotionCode())
-            .build();
+        return new CouponCreateResponseDto(
+            coupon.getName(),
+            coupon.getAmount(),
+            coupon.getExpirationPolicy(),
+            coupon.getMinOrderPrice(),
+            coupon.getDiscountType().name(),
+            coupon.getIssuerType().name(),
+            coupon.getIssuerId(),
+            coupon.getMaxCount(),
+            coupon.getAllocatedCount(),
+            coupon.getMaxCountPerCustomer(),
+            coupon.getPromotionCode()
+        );
     }
 
     public Coupon storeCouponSaveDtoToEntity(StoreCouponSaveDto storeCouponSaveDto, Long issuerId) {

@@ -32,7 +32,6 @@ public class CouponCreateResponseDto {
 
     private String promotionCode;
 
-    @Builder
     public CouponCreateResponseDto(
         String name, Long amount, ExpirationPolicy expirationPolicy, Long minOrderPrice,
         String discountType, String issuerType, Long issuerId, Integer maxCount,
