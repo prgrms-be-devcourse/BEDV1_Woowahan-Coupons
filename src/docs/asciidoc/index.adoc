@@ -1,6 +1,6 @@
 :hardbreaks:
 ifndef::snippets[]
-:snippets: ../../../build/generated-snippets
+:snippets: ./build/generated-snippets
 endif::[]
 
 = 우아한 쿠폰들
