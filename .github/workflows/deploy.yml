@@ -52,5 +52,5 @@ jobs:
           --deployment-group-name github-actions-group \
           --file-exists-behavior OVERWRITE \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --s3-location bucket=woowahan-coupons, bundleType=zip, key=wocou-jar.zip \
+          --s3-location bucket=woowahan-coupons,bundleType=zip,key=wocou-jar.zip \
           --region ap-northeast-2
