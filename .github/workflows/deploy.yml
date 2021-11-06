@@ -44,3 +44,13 @@ jobs:
           --region ap-northeast-2 \
           --acl private \
           ./wocou-jar.zip s3://woowahan-coupons/
+
+      - name: Code Deploy
+        run: |
+          aws deploy create-deployment
+          --application-name github-actions-deploy \
+          --deployment-group-name github-actions-group
+          --file-exists-behavior OVERWRITE
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --s3-location bucket=woowahan-coupons, bundleType=zip, key=wocou-jar.zip
+          --region ap-northeast-2
