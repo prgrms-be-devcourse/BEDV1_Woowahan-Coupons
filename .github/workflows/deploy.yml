@@ -19,6 +19,7 @@ jobs:
           cache: gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build with Gradle
         run: ./gradlew build
 
@@ -27,6 +28,9 @@ jobs:
 
       - name: Copy Jar
         run: cp ./build/libs/*.jar ./deploy
+
+      - name: Copy appspec
+        run: cp ./appspec.yml ./deploy/
 
       - name: Make zip file
         run: zip -r ./wocou-jar.zip ./deploy
