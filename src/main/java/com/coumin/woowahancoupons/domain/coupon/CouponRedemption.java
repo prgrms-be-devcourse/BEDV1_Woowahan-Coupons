@@ -4,13 +4,14 @@ import com.coumin.woowahancoupons.domain.BaseEntity;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import com.coumin.woowahancoupons.domain.Order;
 import com.coumin.woowahancoupons.global.exception.CouponAlreadyUseException;
-import com.coumin.woowahancoupons.global.exception.CouponExpireException;
+import com.coumin.woowahancoupons.global.exception.CouponMinOrderPriceNotSatisfyException;
+import com.coumin.woowahancoupons.global.exception.CouponRedemptionExpireException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionAlreadyAllocateCustomer;
+import com.coumin.woowahancoupons.global.exception.CouponIssuerIdNotMatchException;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.util.Assert;
 
 @Getter
@@ -72,6 +73,11 @@ public class CouponRedemption extends BaseEntity {
         this.customer = customer;
     }
 
+    public void verifyForUse(long issuerId, long orderPrice) {
+        verifyCouponIssuerId(issuerId);
+        verifyCouponMinOrderPrice(orderPrice);
+    }
+
     public void use() {
         verifyExpiration();
         verifyUsed();
@@ -79,15 +85,27 @@ public class CouponRedemption extends BaseEntity {
         this.usedAt = LocalDateTime.now();
     }
 
-    public void verifyCustomer() {
+    private void verifyCustomer() {
         if (customer != null) {
             throw new CouponRedemptionAlreadyAllocateCustomer();
         }
     }
 
+    private void verifyCouponIssuerId(long issuerId) {
+        if (coupon.isNotAdminCoupon() && issuerId != coupon.getIssuerId()) {
+            throw new CouponIssuerIdNotMatchException(coupon.getIssuerType().name(), issuerId);
+        }
+    }
+
+    private void verifyCouponMinOrderPrice(long orderPrice) {
+        if(coupon.getMinOrderPrice() != null && orderPrice < coupon.getMinOrderPrice()) {
+            throw new CouponMinOrderPriceNotSatisfyException(coupon.getMinOrderPrice());
+        }
+    }
+
     private void verifyExpiration() {
-        if (expirationPeriod.isExpiration()) {
-            throw new CouponExpireException();
+        if (isExpiration()) {
+            throw new CouponRedemptionExpireException();
         }
     }
 
@@ -95,5 +113,13 @@ public class CouponRedemption extends BaseEntity {
         if (used) {
             throw new CouponAlreadyUseException();
         }
+    }
+
+    public boolean isExpiration() {
+        return expirationPeriod.isExpiration();
+    }
+
+    public boolean isBrandCouponRedemption() {
+        return coupon.isBrandCoupon();
     }
 }

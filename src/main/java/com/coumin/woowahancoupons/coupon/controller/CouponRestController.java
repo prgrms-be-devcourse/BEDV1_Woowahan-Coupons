@@ -34,7 +34,7 @@ public class CouponRestController {
     @PostMapping("/{couponAdminId}")
     public ApiResponse<CouponCreateResponseDto> createAdminCoupon(
         @PathVariable Long couponAdminId,
-        @RequestBody CouponCreateRequestDto couponCreateRequestDto
+        @RequestBody @Valid CouponCreateRequestDto couponCreateRequestDto
     ) {
         CouponCreateResponseDto couponCreateResponse = couponService.generateCoupon(couponCreateRequestDto, couponAdminId);
         return ApiResponse.success(couponCreateResponse);

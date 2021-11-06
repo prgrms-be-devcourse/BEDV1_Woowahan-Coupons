@@ -1,8 +1,11 @@
 plugins {
     id 'org.springframework.boot' version '2.5.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.asciidoctor.convert' version '1.5.8'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'java'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.3'
+
 }
 
 group = 'com.coumin'
@@ -19,6 +22,14 @@ repositories {
     mavenCentral()
 }
 
+sonarqube {
+    properties {
+        property "sonar.projectKey", "prgrms-be-devcourse_BEDV1_Woowahan-Coupons"
+        property "sonar.organization", "prgrms-be-devcourse"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
 ext {
     set('snippetsDir', file("build/generated-snippets"))
 }
@@ -33,14 +44,64 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    // https://mvnrepository.com/artifact/org.mockito/mockito-inline
+    testImplementation 'org.mockito:mockito-inline:3.8.0'
 }
 
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
 
 asciidoctor {
     inputs.dir snippetsDir
     dependsOn test
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+bootJar {
+    dependsOn asciidoctor
+    copy {
+        from "${asciidoctor.outputDir}"
+        into 'BOOT-INF/classes/static/docs'
+    }
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        html.destination file("$buildDir/jacocoHtml")
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            enabled = true
+            element = 'BUNDLE'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+
+            excludes = []
+        }
+    }
 }

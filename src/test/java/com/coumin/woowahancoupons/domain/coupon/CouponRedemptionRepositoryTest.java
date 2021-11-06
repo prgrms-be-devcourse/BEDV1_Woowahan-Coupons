@@ -1,7 +1,7 @@
 package com.coumin.woowahancoupons.domain.coupon;
 
 
-import com.coumin.woowahancoupons.coupon.TestCouponFactory;
+import com.coumin.woowahancoupons.coupon.factory.TestCouponFactory;
 import com.coumin.woowahancoupons.domain.customer.Customer;
 import java.time.LocalDateTime;
 import java.util.List;

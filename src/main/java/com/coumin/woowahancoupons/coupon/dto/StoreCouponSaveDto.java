@@ -1,16 +1,15 @@
 package com.coumin.woowahancoupons.coupon.dto;
 
 
-import com.coumin.woowahancoupons.domain.coupon.Coupon;
-import com.coumin.woowahancoupons.domain.coupon.DiscountType;
-import com.coumin.woowahancoupons.domain.coupon.ExpirationPolicy;
-import com.coumin.woowahancoupons.domain.coupon.IssuerType;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,19 +38,5 @@ public class StoreCouponSaveDto {
         this.amount = amount;
         this.daysAfterIssuance = daysAfterIssuance;
         this.minOrderPrice = minOrderPrice;
-    }
-
-    public Coupon toEntity(Long issuerId) {
-
-        return Coupon.builder(
-            name,
-            amount,
-            ExpirationPolicy.newByAfterIssueDate(daysAfterIssuance),
-            DiscountType.FIXED_AMOUNT,
-            IssuerType.STORE,
-            issuerId)
-            .minOrderPrice(minOrderPrice)
-            .maxCountPerCustomer(1)
-            .build();
     }
 }

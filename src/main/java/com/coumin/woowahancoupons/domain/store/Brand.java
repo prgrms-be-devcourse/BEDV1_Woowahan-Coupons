@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.*;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "brands")
 @Entity

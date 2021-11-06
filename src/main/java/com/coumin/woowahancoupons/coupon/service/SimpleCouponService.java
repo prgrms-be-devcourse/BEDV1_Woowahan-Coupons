@@ -1,6 +1,6 @@
 package com.coumin.woowahancoupons.coupon.service;
 
-import com.coumin.woowahancoupons.coupon.dto.CouponConverter;
+import com.coumin.woowahancoupons.coupon.converter.CouponConverter;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponCreateResponseDto;
 import com.coumin.woowahancoupons.coupon.dto.StoreCouponSaveRequestDto;
@@ -44,7 +44,8 @@ public class SimpleCouponService implements CouponService {
         }
 
         List<Coupon> coupons = requestDto.getStoreCouponSaves().stream()
-            .map(storeCouponSaveDto -> storeCouponSaveDto.toEntity(storeId))
+            .map(storeCouponSaveDto -> couponConverter.storeCouponSaveDtoToEntity(
+                storeCouponSaveDto, storeId))
             .collect(Collectors.toCollection(ArrayList::new));
         couponRepository.saveAll(coupons);
     }
