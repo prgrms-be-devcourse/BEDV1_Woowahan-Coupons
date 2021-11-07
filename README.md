@@ -344,4 +344,4 @@
 
 # 회고
 
-- 노션링크
+- [회고 링크](https://backend-devcourse.notion.site/59ba830a27bf430984b018213d1e07c0)
