@@ -18,6 +18,7 @@ import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
 import com.coumin.woowahancoupons.global.exception.StoreNotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Service;
@@ -73,6 +74,7 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
     @Override
     public List<CouponRedemptionResponseDto> findCustomerCouponRedemptions(Long customerId) {
         return couponRedemptionRepository.findByCustomerIdAndUsedFalse(customerId).stream()
+            .filter(Predicate.not(CouponRedemption::isExpiration))
             .map(couponRedemptionConverter::convertToCouponRedemptionResponseDto)
             .collect(Collectors.toList());
     }
