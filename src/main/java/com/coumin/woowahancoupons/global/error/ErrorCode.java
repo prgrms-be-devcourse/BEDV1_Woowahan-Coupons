@@ -23,7 +23,10 @@ public enum ErrorCode {
     COUPON_MAX_COUNT_OVER(400, "CP02", "Can not issue coupon codes. coupon's maxCount : %d, allocatedCount : %d, but your request count : %d"),
 
     COUPON_ISSUER_ID_NOT_MATCH(400, "C009", "Can only be used by %s(%d)"),
-    COUPON_MIN_ORDER_PRICE_NOT_SATISFY(400, "C010", "Can be used when order price is more than %d원");
+    COUPON_MIN_ORDER_PRICE_NOT_SATISFY(400, "C010", "Can be used when order price is more than %d원"),
+    COUPON_MAX_COUNT_PER_CUSTOMER_OVER(400, "CP03", "Can not issue a coupon code to customer. the customer's coupon count has already reached the coupon's maxCountPerCustomer %d"),
+
+    REQUEST_RETRY_FAILED(400, "RR01", "The request failed due to a large number of requests. Please try again later.");
 
     private final int status;
     private final String code;

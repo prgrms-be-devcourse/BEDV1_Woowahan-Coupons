@@ -209,6 +209,62 @@ class CouponRedemptionRestControllerTest {
     }
 
     @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (쿠폰 발행 상한을 넘는 발행 수로 쿠폰 코드 발행을 시도)")
+    void allocateCouponFailureTest3() throws Exception {
+        //Given
+        Customer givenCustomer = givenCustomer();
+        Coupon givenCoupon = TestCouponFactory.builder().maxCount(3).build();
+        entityManager.persist(givenCoupon);
+        IntStream.range(0, 3).forEach(value -> {
+            couponRedemptionService.allocateCouponToCustomerWithIssuance(givenCoupon.getId(), givenCustomer.getId());
+        });
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
+                givenCoupon.getId(),
+                givenCustomer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("allocateCoupon"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_MAX_COUNT_OVER.getCode())));
+    }
+
+    @Test
+    @DisplayName("고객에게 쿠폰 자동 할당 - 실패 테스트 (고객당 쿠폰 발행 상한을 넘는 발행 수로 쿠폰 코드 발행을 시도)")
+    void allocateCouponFailureTest4() throws Exception {
+        //Given
+        Customer givenCustomer = givenCustomer();
+        Coupon givenCoupon = TestCouponFactory.builder().maxCountPerCustomer(1).build();
+        entityManager.persist(givenCoupon);
+        couponRedemptionService.allocateCouponToCustomerWithIssuance(givenCoupon.getId(), givenCustomer.getId());
+
+        //When
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/coupons/{couponId}/customers/{customerId}/allocate",
+                givenCoupon.getId(),
+                givenCustomer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //Then
+        result.andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(handler().handlerType(CouponRedemptionRestController.class))
+            .andExpect(handler().methodName("allocateCoupon"))
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.COUPON_MAX_COUNT_PER_CUSTOMER_OVER.getCode())));
+    }
+
+    @Test
     @DisplayName("쿠폰 코드 발행 - 성공 테스트")
     void issueCouponCodesSuccessTest() throws Exception {
         //Given
