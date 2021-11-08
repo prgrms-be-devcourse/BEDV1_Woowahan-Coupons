@@ -4,6 +4,7 @@ import com.coumin.woowahancoupons.coupon.controller.CouponRedemptionRestControll
 import com.coumin.woowahancoupons.coupon.controller.CouponRestController;
 import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.coupon.service.CouponService;
+import com.coumin.woowahancoupons.global.OptimisticLockTryer;
 import com.coumin.woowahancoupons.store.controller.StoreRestController;
 import com.coumin.woowahancoupons.store.service.StoreService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,5 +36,8 @@ public abstract class ApiDocumentationTest {
 
     @MockBean
     protected StoreService storeService;
+
+    @MockBean
+    protected OptimisticLockTryer optimisticLockTryer;
 
 }

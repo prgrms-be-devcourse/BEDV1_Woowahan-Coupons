@@ -4,6 +4,7 @@ import com.coumin.woowahancoupons.coupon.dto.CouponCheckRequestDto;
 import com.coumin.woowahancoupons.coupon.dto.CouponIssuanceDto;
 import com.coumin.woowahancoupons.coupon.service.CouponRedemptionService;
 import com.coumin.woowahancoupons.global.ApiResponse;
+import com.coumin.woowahancoupons.global.OptimisticLockTryer;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,12 @@ public class CouponRedemptionRestController {
 
     private final CouponRedemptionService couponRedemptionService;
 
-    public CouponRedemptionRestController(CouponRedemptionService couponRedemptionService) {
+    private final OptimisticLockTryer optimisticLockTryer;
+
+    public CouponRedemptionRestController(CouponRedemptionService couponRedemptionService,
+        OptimisticLockTryer optimisticLockTryer) {
         this.couponRedemptionService = couponRedemptionService;
+        this.optimisticLockTryer = optimisticLockTryer;
     }
 
     @PatchMapping("/{couponCode}/customers/{customerId}/register")
@@ -38,7 +43,9 @@ public class CouponRedemptionRestController {
         @PathVariable("couponId") Long couponId,
         @PathVariable("customerId") Long customerId
     ) {
-        couponRedemptionService.allocateCouponToCustomerWithIssuance(couponId, customerId);
+        optimisticLockTryer.attempt(
+            () -> couponRedemptionService.allocateCouponToCustomerWithIssuance(couponId, customerId),
+            10);
         return ApiResponse.success();
     }
 

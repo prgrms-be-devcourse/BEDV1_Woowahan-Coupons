@@ -12,6 +12,7 @@ import com.coumin.woowahancoupons.domain.customer.CustomerRepository;
 import com.coumin.woowahancoupons.domain.store.Brand;
 import com.coumin.woowahancoupons.domain.store.StoreRepository;
 import com.coumin.woowahancoupons.global.exception.CouponMaxCountOverException;
+import com.coumin.woowahancoupons.global.exception.CouponMaxCountPerCustomerOverException;
 import com.coumin.woowahancoupons.global.exception.CouponNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CouponRedemptionNotFoundException;
 import com.coumin.woowahancoupons.global.exception.CustomerNotFoundException;
@@ -64,11 +65,20 @@ public class SimpleCouponRedemptionService implements CouponRedemptionService {
     @Transactional
     @Override
     public void allocateCouponToCustomerWithIssuance(Long couponId, Long customerId) {
+        int issuanceCount = 1;
         Coupon coupon = couponRepository.findById(couponId)
             .orElseThrow(() -> new CouponNotFoundException(couponId));
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new CustomerNotFoundException(customerId));
+        if (!coupon.canIssueCouponCodes(issuanceCount)) {
+            throw new CouponMaxCountOverException(coupon.getMaxCount(), coupon.getAllocatedCount(), issuanceCount);
+        }
+        int customerCouponCount = couponRedemptionRepository.countByCouponIdAndCustomerId(couponId, customerId);
+        if (!coupon.canIssueCouponCodeToCustomer(customerCouponCount)) {
+            throw new CouponMaxCountPerCustomerOverException(coupon.getMaxCountPerCustomer());
+        }
         couponRedemptionRepository.save(CouponRedemption.of(coupon, customer));
+        coupon.increaseAllocatedCount(issuanceCount);
     }
 
     @Override
