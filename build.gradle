@@ -27,6 +27,8 @@ sonarqube {
         property "sonar.projectKey", "prgrms-be-devcourse_BEDV1_Woowahan-Coupons"
         property "sonar.organization", "prgrms-be-devcourse"
         property "sonar.host.url", "https://sonarcloud.io"
+        property 'sonar.coverage.jacoco.xmlReportPaths', "$buildDir/jacoco.xml"
+
     }
 }
 
@@ -85,6 +87,9 @@ jacocoTestReport {
     reports {
         html.enabled true
         html.destination file("$buildDir/jacocoHtml")
+
+        xml.enabled true
+        xml.destination file("$buildDir/jacoco.xml")
     }
     finalizedBy 'jacocoTestCoverageVerification'
 }
